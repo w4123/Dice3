@@ -10,7 +10,7 @@ namespace cq::event {
 namespace dice {
     class echo_module : public dice_module {
     public:
-        bool match(const cq::event::MessageEvent& e) override;
-        void process(const cq::event::MessageEvent& e) override;
+        bool match(const cq::event::MessageEvent& e, const std::wstring& ws) override;
+        void process(const cq::event::MessageEvent& e, const std::wstring& ws) override;
     };
 } // namespace dice
