@@ -1,11 +1,11 @@
 {
     "ret": 1,
     "apiver": 9,
-    "name": "Demo",
-    "version": "1.0.0",
+    "name": "Dice!",
+    "version": "3.0.0",
     "version_id": 1,
-    "author": "Your Name",
-    "description": "这是 CoolQ C++ SDK 的一个 Demo。",
+    "author": "w4123溯洄",
+    "description": "跑团用掷骰机器人",
     "event": [
         {
             "id": 1003,
