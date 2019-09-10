@@ -13,7 +13,7 @@ namespace dice {
         return std::regex_match(ws, re);
     }
     void r_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {  
-        std::wregex re(L"[\\.。]r([0-9d+\\-*x/×÷\\(\\)]*)(.*)",
+        std::wregex re(L"[\\.。]r([0-9d+\\-]*)(.*)",
                       std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         auto ret = std::regex_match(ws, m, re);
