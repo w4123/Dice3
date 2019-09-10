@@ -15,8 +15,8 @@ Dice! V3 是重构后的Dice!新版本(目前仍在编写中, 尚未完成无法
 ### 下载
 
 ```ps1
-git clone https://github.com/richardchien/coolq-cpp-sdk.git my-awesome-app
-cd my-awesome-app
+git clone https://github.com/w4123/Dice3 Dice
+cd Dice
 git submodule init
 git submodule update
 ```
@@ -49,7 +49,7 @@ powershell .\scripts\build.ps1 Debug
 如果不想每次构建后都手动安装插件，可以添加 `scripts/install.ps1` 文件（使用 UTF-16 LE 编码）如下：
 
 ```ps1
-$coolqRoot = "C:\Users\Richard\Lab\酷Q Pro" # 注意修改 酷Q 目录
+$coolqRoot = "dir\to\CoolQ" # 注意修改 酷Q 目录
 
 $appId = $args[0]
 $libName = $args[1]
