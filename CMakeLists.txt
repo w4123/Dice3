@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
+set(CMAKE_GENERATOR_TOOLSET "host=x86")
+set(CMAKE_GENERATOR_PLATFORM "Win32")
 project(coolq-cpp-sdk)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -15,6 +17,7 @@ include_directories(${VCPKG_INCLUDE_DIR})
 include_directories(src)
 
 add_compile_definitions(BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
+                        _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
                         _WIN32_WINNT=0x0501
                         WIN32_LEAN_AND_MEAN
                         NOMINMAX)

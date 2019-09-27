@@ -28,7 +28,7 @@ if (-Not (Test-Path ".\build\$configType\ALL_BUILD.vcxproj"))
 
 Write-Host "正在使用 CMake 构建项目……"
 
-& $cmake --build .\build\$configType --config $configType
+& $cmake --build .\build\$configType --config $configType -- "-p:Platform=x86"
 
 if ($?)
 {
