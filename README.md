@@ -1,6 +1,9 @@
 # Dice V3
 
+[![Build status](https://ci.appveyor.com/api/projects/status/ft7x1jvdam3xb8jc?svg=true)](https://ci.appveyor.com/project/w4123/dice3)
+
 Dice! V3 是重构后的Dice!新版本(目前仍在编写中, 尚未完成无法使用)
+
 
 ## 使用方式
 
@@ -70,4 +73,4 @@ Copy-Item -Force $jsonPath "$coolqAppDevDir\$jsonName"
 Write-Host "拷贝完成" -ForegroundColor Green
 ```
 
-后期生成事件脚本 [`scripts\post_build.ps1`](scripts\post_build.ps1) 发现存在 `scripts/install.ps1` 时会自动运行它，从而将构建出的 DLL 和 JSON 文件安装到 酷Q，此时在 酷Q 悬浮窗快速重启即可。
+后期生成事件脚本 [`scripts/post_build.ps1`](scripts/post_build.ps1) 发现存在 `scripts/install.ps1` 时会自动运行它，从而将构建出的 DLL 和 JSON 文件安装到 酷Q，此时在 酷Q 悬浮窗快速重启即可。
