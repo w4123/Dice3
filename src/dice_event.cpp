@@ -31,7 +31,7 @@ CQ_MAIN {
             }
         }
 
-        // 如果匹配到复合的模块，使用此模块进行处理
+        // 如果匹配到符合的模块，使用此模块进行处理
         if (process_module) {
             e.block();
             process_module->process(e, ws);

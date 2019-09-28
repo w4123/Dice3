@@ -19,6 +19,7 @@ namespace dice {
         dice_calculator(std::wstring dice_expression);
 
     private:
+        static std::mt19937 dice_calculator::ran;
         std::stack<double> num_stk;
         std::stack<wchar_t> operator_stk;
         wchar_t operator_stk_top();

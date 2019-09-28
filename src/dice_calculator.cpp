@@ -1,4 +1,6 @@
 #include "dice_calculator.h"
+#include "dice_msg.h"
+#include "dice_exception.h"
 #include <exception>
 #include <random>
 #include <regex>
@@ -6,53 +8,56 @@
 #include <string>
 
 namespace dice {
+
+    std::mt19937 dice_calculator::ran(clock());
+
     dice_calculator::dice_calculator(std::wstring dice_expression) : dice_expression(std::move(dice_expression)) {
         main_calculate();
     }
 
     wchar_t dice_calculator::operator_stk_top() {
         if (operator_stk.empty()) {
-            throw std::exception("Operator Stack Empty Err");
+            throw exception::dice_expression_invalid_error();
         }
         return operator_stk.top();
     }
     void dice_calculator::operator_stk_pop() {
         if (operator_stk.empty()) {
-            throw std::exception("Operator Stack Empty Err");
+            throw exception::dice_expression_invalid_error();
         }
         operator_stk.pop();
     }
     double dice_calculator::num_stk_top() {
         if (num_stk.empty()) {
-            throw std::exception("Num Stack Empty Err");
+            throw exception::dice_expression_invalid_error();
         }
         return num_stk.top();
     }
     void dice_calculator::num_stk_pop() {
         if (num_stk.empty()) {
-            throw std::exception("Num Stack Empty Err");
+            throw exception::dice_expression_invalid_error();
         }
         num_stk.pop();
     }
 
     int dice_calculator::priority(wchar_t c) {
         switch (c) {
-        case L'(':
-            return 4;
         case L'^':
-            return 1;
-        case L'+':
-        case L'-':
-            return 2;
+            return 0;
         case L'*':
         case L'/':
         case L'x':
         case L'X':
         case L'×':
         case L'÷':
+            return 1;
+        case L'+':
+        case L'-':
+            return 2;
+        case L'(':
             return 3;
         default:
-            return 4;
+            throw exception::dice_expression_invalid_error();
         }
     }
     void dice_calculator::scan_and_replace_dice() {
@@ -75,14 +80,13 @@ namespace dice {
                 right = std::stoi(match[2]);
             }
             if (left == 0) {
-                throw std::exception("0 Dice Error");
+                throw exception::dice_expression_invalid_error();
             }
             if (right == 0) {
-                throw std::exception("0 Side Error");
+                throw exception::dice_expression_invalid_error();
             }
             std::wstring di;
             int temp_total = 0;
-            std::mt19937 ran(clock());
             std::uniform_int_distribution<int> gen(1, right);
             for (int k = 0; k != left; k++) {
                 int temp_res = gen(ran);
@@ -131,7 +135,7 @@ namespace dice {
                 }
 
                 if (i < res_display2.size() && res_display2[i] == L'(') {
-                    if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk_top()))
+                    if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk.top()))
                         pop_stack_and_calculate();
                     operator_stk.push(L'*');
                 }
@@ -142,9 +146,9 @@ namespace dice {
                     while (operator_stk_top() != L'(') {
                         pop_stack_and_calculate();
                     }
-                    operator_stk_pop();
+                    operator_stk.pop();
                     if (i + 1 < res_display2.size() && res_display2[i + 1] == L'(') {
-                        if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk_top()))
+                        if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk.top()))
                             pop_stack_and_calculate();
                         operator_stk.push(L'*');
                     }
@@ -161,7 +165,7 @@ namespace dice {
             pop_stack_and_calculate();
         }
         if (num_stk.size() != 1) {
-            throw std::exception("Stack not empty at end of calculation");
+            throw exception::dice_expression_invalid_error();
         }
         result = num_stk.top();
     }
@@ -195,7 +199,7 @@ namespace dice {
             res = pow(left, right);
             break;
         default:
-            throw std::exception("Unknown Operator");
+            throw exception::dice_expression_invalid_error();
         }
         num_stk.push(res);
     }
@@ -212,7 +216,8 @@ namespace dice {
         if (res[res.length() - 1] == L'.') res = res.substr(0, res.length() - 1);
         if (res != res_display2) {
             str += L"=" + res;
-		}
+	}
+        if (str.length() > 160) str = dice_expression + L"=" + res;
         return str;
     }
 } // namespace dice
