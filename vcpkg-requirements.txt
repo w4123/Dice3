@@ -1,2 +1,4 @@
+sqlite3
+sqlitecpp
 boost-algorithm
 libiconv
