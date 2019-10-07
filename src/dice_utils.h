@@ -16,4 +16,10 @@ namespace dice::utils {
 
     // 格式化字符串
     std::string format_string(const std::string& origin_str, const std::map<std::string, std::string>& format_para);
+
+	// 获取权限 群
+    bool is_admin_or_owner(const int64_t group_id, const int64_t user_id);
+
+	// 获取权限 综合 (非群返回永远为真)
+    bool is_admin_or_owner(const cq::Target& target);
 }

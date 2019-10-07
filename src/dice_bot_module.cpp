@@ -3,6 +3,7 @@
 #include "cqsdk/cqsdk.h"
 #include "dice_db.h"
 #include "dice_msg.h"
+#include "dice_utils.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -16,7 +17,7 @@ namespace dice {
     }
 
     bool bot_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        std::wregex re(L"[.。]bot.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
+        std::wregex re(L"[ ]*[\\.。]bot.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         if (std::regex_match(ws, re)) return true;
         return std::get<1>(search_db(e));
     }
@@ -67,7 +68,7 @@ namespace dice {
         statement.exec();
     }
     void bot_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        std::wregex re(L"[.。]bot[ ]*(on|off)?[ ]*([0-9]*).*",
+        std::wregex re(L"[ ]*[\\.。]bot[ ]*(on|off)?[ ]*([0-9]*).*",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
@@ -76,6 +77,10 @@ namespace dice {
             std::wstring self_id = std::to_wstring(cq::api::get_login_user_id());
             if (target.empty() || target == self_id || target == self_id.substr(self_id.length() - 4)) {
                 if (command == L"on") {
+                    if (e.message_type == cq::message::GROUP && !utils::is_admin_or_owner(e.target)) {
+                        cq::api::send_msg(e.target, msg::global_msg["strPermissionDeniedError"]);
+                        return;
+					}
                     if (std::get<0>(search_db(e))) {
                         update_db(e, false);
                     } else {
@@ -83,6 +88,10 @@ namespace dice {
                     }
                     cq::api::send_msg(e.target, msg::global_msg["strEnabled"]);
                 } else if (command == L"off") {
+                    if (e.message_type == cq::message::GROUP && !utils::is_admin_or_owner(e.target)) {
+                        cq::api::send_msg(e.target, msg::global_msg["strPermissionDeniedError"]);
+                        return;
+                    }
                     if (std::get<0>(search_db(e))) {
                         update_db(e, true);
                     } else {

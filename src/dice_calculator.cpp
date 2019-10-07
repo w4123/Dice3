@@ -1,11 +1,11 @@
 #include "dice_calculator.h"
-#include "dice_msg.h"
-#include "dice_exception.h"
 #include <exception>
 #include <random>
 #include <regex>
 #include <stdexcept>
 #include <string>
+#include "dice_exception.h"
+#include "dice_msg.h"
 
 namespace dice {
 
@@ -61,40 +61,90 @@ namespace dice {
         }
     }
     void dice_calculator::scan_and_replace_dice() {
-        std::wregex d(L"([0-9]*)d([0-9]*)", std::regex_constants::ECMAScript | std::regex_constants::icase);
+        // 用于把简写替换成完整拼写，方便阅读
+        std::wstring replaced_dice_expression;
+
+        // 匹配标准掷骰
+        std::wregex d(L"([0-9]*)d([0-9]*)(k([0-9]*))?",
+                      std::regex_constants::ECMAScript | std::regex_constants::icase);
         auto words_begin = std::wsregex_iterator(dice_expression.begin(), dice_expression.end(), d);
         auto words_end = std::wsregex_iterator();
-        int left = 0, right = 0, last = 0;
+
+        // 骰子个数 骰子面数 上一个匹配到的位置的下一位
+        int left = 0, right = 0, last = 0, keep = 0;
+        bool EnableKeep = false;
         for (auto i = words_begin; i != words_end; ++i) {
+            // 两个连续且中间无任何运算符的骰子属于错误表达式
+            if (last && last == i->position()) {
+                throw exception::dice_expression_invalid_error();
+            }
             left = 1;
             right = 100;
+            keep = 1;
+            EnableKeep = false;
+
+            replaced_dice_expression +=
+                std::wstring(dice_expression.begin() + last, dice_expression.begin() + i->position());
             res_display += std::wstring(dice_expression.begin() + last, dice_expression.begin() + i->position());
             res_display2 += std::wstring(dice_expression.begin() + last, dice_expression.begin() + i->position());
             last = i->position() + i->length();
-
             std::wsmatch match = *i;
+
+            // 保存这个骰子的信息并替换缩写
+            std::wstring dice(match[0].first, match[0].second);
+
+            // 字母D转换为大写
+            for (auto& c : dice) {
+                if (c == L'd') c = L'D';
+                if (c == L'k') c = L'K';
+            }
+
             if (match[1].first != match[1].second) {
                 left = std::stoi(match[1]);
+            } else {
+                dice = std::to_wstring(left) + dice;
             }
             if (match[2].first != match[2].second) {
                 right = std::stoi(match[2]);
+            } else {
+                dice += std::to_wstring(right);
             }
-            if (left == 0) {
+
+            if (match[3].first != match[3].second) {
+                EnableKeep = true;
+                if (match[4].first != match[4].second) {
+                    keep = std::stoi(match[4]);
+                    if (keep <= 0 || keep > left) {
+                        throw exception::dice_expression_invalid_error();
+                    }
+                }
+            }
+
+            if (left <= 0 || right <= 0) {
                 throw exception::dice_expression_invalid_error();
             }
-            if (right == 0) {
-                throw exception::dice_expression_invalid_error();
-            }
+
             std::wstring di;
             int temp_total = 0;
             std::uniform_int_distribution<int> gen(1, right);
+            std::vector<int> DiceResults;
             for (int k = 0; k != left; k++) {
                 int temp_res = gen(ran);
-                temp_total += temp_res;
-                di += std::to_wstring(temp_res);
-                if (k != left - 1) di += L"+";
+                if (!EnableKeep || static_cast<int> (DiceResults.size()) < keep) {
+                    DiceResults.push_back(temp_res);
+                } else {
+                    auto min_ele = std::min_element(DiceResults.begin(), DiceResults.end());
+                    if (temp_res > *min_ele) *min_ele = temp_res;
+                }
             }
-            if (!(left == 1 || i->length() == dice_expression.length()
+
+            for (int k = 0; k != DiceResults.size(); k++) {
+                temp_total += DiceResults[k];
+                di += std::to_wstring(DiceResults[k]);
+                if (k != DiceResults.size() - 1) di += L"+";
+            }
+
+            if (!(DiceResults.size() == 1 || i->length() == dice_expression.length()
                   || (i->position() != 0 && dice_expression[i->position() - 1] == L'('
                       && i->position() + i->length() != dice_expression.length()
                       && dice_expression[i->position() + i->length()] == L')'))) {
@@ -102,9 +152,12 @@ namespace dice {
             }
             res_display += di;
             res_display2 += std::to_wstring(temp_total);
+            replaced_dice_expression += dice;
         }
         res_display += std::wstring(dice_expression.begin() + last, dice_expression.end());
         res_display2 += std::wstring(dice_expression.begin() + last, dice_expression.end());
+        replaced_dice_expression += std::wstring(dice_expression.begin() + last, dice_expression.end());
+        dice_expression = replaced_dice_expression;
     }
 
     void dice_calculator::main_calculate() {
@@ -216,7 +269,7 @@ namespace dice {
         if (res[res.length() - 1] == L'.') res = res.substr(0, res.length() - 1);
         if (res != res_display2) {
             str += L"=" + res;
-	}
+        }
         if (str.length() > 160) str = dice_expression + L"=" + res;
         return str;
     }

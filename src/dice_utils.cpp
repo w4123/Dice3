@@ -1,10 +1,10 @@
+#include "dice_utils.h"
 #include <map>
 #include <regex>
 #include <string>
 #include "cqsdk/cqsdk.h"
 #include "cqsdk/types.h"
 #include "dice_msg.h"
-#include "dice_utils.h"
 
 namespace dice::utils {
 
@@ -49,6 +49,20 @@ namespace dice::utils {
         }
         new_str += origin_str.substr(last);
         return new_str;
+    }
+
+	// 获取权限 群
+    bool is_admin_or_owner(const int64_t group_id, const int64_t user_id) {
+        auto role = cq::api::get_group_member_info(group_id, user_id).role;
+        return (role == cq::GroupRole::ADMIN || role == cq::GroupRole::OWNER);
+    }
+
+	// 获取权限 综合 (非群返回永远为真)
+    bool is_admin_or_owner(const cq::Target& target) {
+        if (target.group_id.has_value() && target.user_id.has_value()) {
+            return is_admin_or_owner(*target.group_id, *target.user_id);
+		}
+        return true;
     }
 
 } // namespace dice::utils

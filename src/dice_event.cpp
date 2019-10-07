@@ -4,18 +4,25 @@
  */
 
 #include "cqsdk/cqsdk.h"
+#include "dice_bot_module.h"
+#include "dice_coc_module.h"
 #include "dice_db.h"
+#include "dice_dnd_module.h"
 #include "dice_module.h"
 #include "dice_r_module.h"
-#include "dice_bot_module.h"
 
 CQ_MAIN {
     // 应用启用时调用，进行模块启用
     cq::app::on_enable = [] {
         // 连接数据库
-        db = std::make_unique<SQLite::Database>(cq::api::get_app_directory() + "DiceConfig.db", SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE, 3000);
+        db = std::make_unique<SQLite::Database>(
+            cq::api::get_app_directory() + "DiceConfig.db", SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE, 3000);
 
         static dice::bot_module BotModule;
+
+        static dice::coc_module CocModule;
+
+        static dice::dnd_module DndModule;
 
         // 启用普通掷骰模块
         static dice::r_module RModule;
@@ -23,6 +30,11 @@ CQ_MAIN {
 
     // 主消息处理函数
     auto main_func = [](const auto &e) {
+        if (!e.message.empty() && e.message.begin()->type == "at"
+            && e.message.begin()->data.at("qq") != std::to_string(cq::api::get_login_user_id())) {
+            return;
+        }
+
         // 转换为宽字符串，用于正则匹配
         std::wstring ws = cq::utils::s2ws(e.message.extract_plain_text());
 
@@ -38,7 +50,11 @@ CQ_MAIN {
         // 如果匹配到符合的模块，使用此模块进行处理
         if (process_module) {
             e.block();
-            process_module->process(e, ws);
+            try {
+                process_module->process(e, ws);
+            } catch (std::exception &ex) {
+                cq::api::send_msg(e.target, ex.what());
+            }
         }
     };
 

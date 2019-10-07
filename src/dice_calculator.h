@@ -6,7 +6,7 @@
 namespace dice {
     class dice_calculator {
     public:
-        const std::wstring dice_expression;
+		std::wstring dice_expression;
 
         // 过程显示1
         std::wstring res_display;
