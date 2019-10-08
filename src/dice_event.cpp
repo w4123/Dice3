@@ -15,8 +15,10 @@ CQ_MAIN {
     // 应用启用时调用，进行模块启用
     cq::app::on_enable = [] {
         // 连接数据库
-        db = std::make_unique<SQLite::Database>(
-            cq::api::get_app_directory() + "DiceConfig.db", SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE, 3000);
+        dice::db::db = std::make_unique<SQLite::Database>(
+            cq::api::get_app_directory() + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",  SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE, 3000);
+
+        dice::db::InitialiseDB();
 
         static dice::bot_module BotModule;
 
@@ -63,6 +65,6 @@ CQ_MAIN {
     cq::event::on_group_msg = main_func;
     cq::event::on_discuss_msg = main_func;
 
-    cq::app::on_disable = [] { db = nullptr; };
-    cq::app::on_coolq_exit = [] { db = nullptr; };
+    cq::app::on_disable = [] { dice::db::db = nullptr; };
+    cq::app::on_coolq_exit = [] { dice::db::db = nullptr; };
 }

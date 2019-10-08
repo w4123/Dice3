@@ -265,8 +265,7 @@ namespace dice {
             str += L"=" + res_display2;
         }
         std::wstring res = std::to_wstring(result);
-        res = res.substr(0, std::min(res.find(L".") + 3, res.find_last_not_of(L"0.") + 1));
-        if (res[res.length() - 1] == L'.') res = res.substr(0, res.length() - 1);
+        res = res.substr(0, std::max(res.find(L'.'),std::min(res.find(L'.') + 3, res.find_last_not_of(L"0.") + 1)));
         if (res != res_display2) {
             str += L"=" + res;
         }

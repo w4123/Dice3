@@ -4,6 +4,11 @@
 #include "cqsdk/types.h"
 
 namespace dice::utils {
+    // 群名获取
+    std::string get_groupname(const int64_t group_id);
+
+    // 来源获取
+    std::string get_originname(const cq::Target& target);
 
     // 昵称获取 群
     std::string get_nickname(const int64_t group_id, const int64_t user_id);

@@ -10,11 +10,11 @@ namespace cq::event {
 
 namespace dice {
     bool coc_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        std::wregex re(L"[ ]*[\\.。]coc.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
+        std::wregex re(L"[ ]*[\\.。．][ ]*coc.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
     void coc_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        std::wregex re(L"[ ]*[\\.。]coc(6|7)?(d)?[ ]*([0-9]*).*",
+        std::wregex re(L"[ ]*[\\.。．][ ]*coc(6|7)?(d)?[ ]*([0-9]*).*",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
@@ -27,11 +27,11 @@ namespace dice {
                 if (m[3].first != m[3].second) {
                     auto GenerateCountStr = std::wstring(m[3].first, m[3].second);
                     if (GenerateCountStr.length() > 2) {
-                        throw exception::exception(msg::global_msg["strGenerateCountError"]);
+                        throw exception::exception(msg::GetGlobalMsg("strGenerateCountError"));
                     }
                     GenerateCount = std::stoi(std::wstring(m[3].first, m[3].second));
                     if (GenerateCount > 10 || GenerateCount <= 0) {
-                        throw exception::exception(msg::global_msg["strGenerateCountError"]);
+                        throw exception::exception(msg::GetGlobalMsg("strGenerateCountError"));
                     }
                 }
                 std::string CharacterCards;
@@ -95,7 +95,7 @@ namespace dice {
                 }
                 cq::api::send_msg(
                     e.target,
-                    utils::format_string(msg::global_msg["strCharacterCard"],
+                    utils::format_string(msg::GetGlobalMsg("strCharacterCard"),
                                          std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)},
                                                                             {"version", UseCOC6 ? "COC6" : "COC7"},
                                                                             {"character_cards", CharacterCards}}));

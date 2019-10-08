@@ -8,6 +8,26 @@
 
 namespace dice::utils {
 
+    std::string get_groupname(const int64_t group_id) {
+        auto list = cq::api::get_group_list();
+        for (auto& ele : list) {
+            if (ele.group_id == group_id) {
+                return ele.group_name;
+            }
+        }
+        return msg::GetGlobalMsg("strGroupnameError");
+    }
+
+    std::string get_originname(const cq::Target& target) {
+        if (target.group_id.has_value()) {
+            return "群\"" + get_groupname(*target.group_id) + "\"";
+        }
+        if (target.discuss_id.has_value()) {
+            return "讨论组";
+        }
+        return "私聊会话";
+    }
+
     // 昵称获取 群
     std::string get_nickname(const int64_t group_id, const int64_t user_id) {
         const cq::GroupMember gm = cq::api::get_group_member_info(group_id, user_id);
@@ -28,7 +48,7 @@ namespace dice::utils {
             }
             return get_nickname(*target.user_id);
         }
-        return msg::global_msg["strNicknameError"];
+        return msg::GetGlobalMsg("strNicknameError");
     }
 
     // 格式化字符串
@@ -51,17 +71,17 @@ namespace dice::utils {
         return new_str;
     }
 
-	// 获取权限 群
+    // 获取权限 群
     bool is_admin_or_owner(const int64_t group_id, const int64_t user_id) {
         auto role = cq::api::get_group_member_info(group_id, user_id).role;
         return (role == cq::GroupRole::ADMIN || role == cq::GroupRole::OWNER);
     }
 
-	// 获取权限 综合 (非群返回永远为真)
+    // 获取权限 综合 (非群返回永远为真)
     bool is_admin_or_owner(const cq::Target& target) {
         if (target.group_id.has_value() && target.user_id.has_value()) {
             return is_admin_or_owner(*target.group_id, *target.user_id);
-		}
+        }
         return true;
     }
 
