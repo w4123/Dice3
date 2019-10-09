@@ -10,6 +10,9 @@
 #include "dice_dnd_module.h"
 #include "dice_module.h"
 #include "dice_r_module.h"
+#include "dice_help_module.h"
+#include "dice_set_module.h"
+
 
 CQ_MAIN {
     // 应用启用时调用，进行模块启用
@@ -21,6 +24,10 @@ CQ_MAIN {
         dice::db::InitialiseDB();
 
         static dice::bot_module BotModule;
+
+		static dice::help_module HelpModule;
+
+		static dice::set_module SetModule;
 
         static dice::coc_module CocModule;
 
@@ -56,6 +63,7 @@ CQ_MAIN {
                 process_module->process(e, ws);
             } catch (std::exception &ex) {
                 cq::api::send_msg(e.target, ex.what());
+                cq::logging::debug("Dice! V3", ex.what());
             }
         }
     };

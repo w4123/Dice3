@@ -17,11 +17,13 @@ namespace dice {
 
         std::wstring form_string();
         dice_calculator(std::wstring dice_expression);
+        dice_calculator(std::wstring dice_expression, int default_dice);
 
     private:
         static std::mt19937 dice_calculator::ran;
         std::stack<double> num_stk;
         std::stack<wchar_t> operator_stk;
+        const int default_dice = 100;
         wchar_t operator_stk_top();
         void operator_stk_pop();
         double num_stk_top();

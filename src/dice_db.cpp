@@ -18,7 +18,7 @@ namespace dice::db
             "is_admin INTEGER DEFAULT 0, admin_time INTEGER, is_white INTEGER DEFAULT 0, white_time INTEGER, "
             "jrrp_value "
             "INTEGER, jrrp_time "
-            "INTEGER, bot_on INTEGER DEFAULT 1, card_chosen TEXT DEFAULT \"default\", nick_name TEXT)");
+            "INTEGER, bot_on INTEGER DEFAULT 1, card_chosen TEXT DEFAULT \"default\", nick_name TEXT, default_dice INTEGER NOT NULL DEFAULT 100)");
         db->exec(
             "CREATE TABLE IF NOT EXISTS character_cards (qq_id INTEGER NOT NULL, card_name TEXT NOT NULL, card_detail "
             "TEXT, "

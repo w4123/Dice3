@@ -1,17 +1,21 @@
 #include "dice_calculator.h"
+#include <cwctype>
 #include <exception>
 #include <random>
 #include <regex>
-#include <stdexcept>
 #include <string>
 #include "dice_exception.h"
-#include "dice_msg.h"
 
 namespace dice {
 
     std::mt19937 dice_calculator::ran(clock());
 
     dice_calculator::dice_calculator(std::wstring dice_expression) : dice_expression(std::move(dice_expression)) {
+        main_calculate();
+    }
+
+    dice_calculator::dice_calculator(std::wstring dice_expression, int default_dice)
+        : dice_expression(std::move(dice_expression)), default_dice(default_dice) {
         main_calculate();
     }
 
@@ -60,12 +64,14 @@ namespace dice {
             throw exception::dice_expression_invalid_error();
         }
     }
+
+    // 替换标准骰子及惩罚奖励骰(3d6, 4d6k3, p3, b3)
     void dice_calculator::scan_and_replace_dice() {
         // 用于把简写替换成完整拼写，方便阅读
         std::wstring replaced_dice_expression;
 
         // 匹配标准掷骰
-        std::wregex d(L"([0-9]*)d([0-9]*)(k([0-9]*))?",
+        std::wregex d(L"(([0-9]*)d([0-9]*)(k([0-9]*))?)|((b|p)([1-3])?)",
                       std::regex_constants::ECMAScript | std::regex_constants::icase);
         auto words_begin = std::wsregex_iterator(dice_expression.begin(), dice_expression.end(), d);
         auto words_end = std::wsregex_iterator();
@@ -78,11 +84,22 @@ namespace dice {
             if (last && last == i->position()) {
                 throw exception::dice_expression_invalid_error();
             }
+
+            // 骰子前后有数字属于错误表达式
+            if ((i->position() && std::iswdigit(dice_expression[i->position() - 1]))
+                || (i->position() + i->length() != dice_expression.length()
+                    && std::iswdigit(dice_expression[i->position() + i->length()])))
+
+            {
+                throw exception::dice_expression_invalid_error();
+            }
+
             left = 1;
-            right = 100;
+            right = default_dice;
             keep = 1;
             EnableKeep = false;
 
+            // 把前面的字符串挪过来
             replaced_dice_expression +=
                 std::wstring(dice_expression.begin() + last, dice_expression.begin() + i->position());
             res_display += std::wstring(dice_expression.begin() + last, dice_expression.begin() + i->position());
@@ -91,32 +108,84 @@ namespace dice {
             std::wsmatch match = *i;
 
             // 保存这个骰子的信息并替换缩写
-            std::wstring dice(match[0].first, match[0].second);
+            std::wstring dice(match[0]);
 
-            // 字母D转换为大写
+            // 字母转换为大写
             for (auto& c : dice) {
                 if (c == L'd') c = L'D';
                 if (c == L'k') c = L'K';
+                if (c == L'b') c = L'B';
+                if (c == L'p') c = L'P';
             }
 
-            if (match[1].first != match[1].second) {
-                left = std::stoi(match[1]);
+            // 奖励惩罚骰
+            if (match[1].first == match[1].second) {
+                int DiceCount = 1;
+                if (match[8].first != match[8].second) {
+                    DiceCount = std::stoi(match[8]);
+                }
+                std::uniform_int_distribution<int> gen100(1, 100);
+                std::uniform_int_distribution<int> gen9(0, 9);
+                std::uniform_int_distribution<int> gen10(1, 10);
+                int first_res = gen100(ran);
+                std::vector<int> bpTempStorage;
+                int res = 0;
+
+                if (first_res % 10) {
+                    for (int k = 0; k != DiceCount; ++k) {
+                        bpTempStorage.push_back(gen9(ran));
+                    }
+                } else {
+                    for (int k = 0; k != DiceCount; ++k) {
+                        bpTempStorage.push_back(gen10(ran));
+                    }
+                }
+
+                std::wstring di;
+                if (match[7] == L"b") {
+                    di = std::to_wstring(first_res) + L"[奖励骰:";
+                    first_res =
+                        std::min((first_res / 10), *std::min_element(bpTempStorage.begin(), bpTempStorage.end())) * 10
+                        + (first_res % 10);
+                } else {
+                    di = std::to_wstring(first_res) + L"[惩罚骰:";
+                    first_res =
+                        std::max((first_res / 10), *std::max_element(bpTempStorage.begin(), bpTempStorage.end())) * 10
+                        + (first_res % 10);
+                }
+                for (const auto& c : bpTempStorage) {
+                    di += std::to_wstring(c);
+                    di += L" ";
+                }
+                di[di.length() - 1] = L']';
+                res_display += di;
+                res_display2 += std::to_wstring(first_res);
+                if (dice.length() == 1) dice += L"1";
+                replaced_dice_expression += dice;
+                continue;
+            }
+
+            // 普通骰
+            if (match[2].first != match[2].second) {
+                left = std::stoi(match[2]);
             } else {
                 dice = std::to_wstring(left) + dice;
             }
-            if (match[2].first != match[2].second) {
-                right = std::stoi(match[2]);
+            if (match[3].first != match[3].second) {
+                right = std::stoi(match[3]);
             } else {
-                dice += std::to_wstring(right);
+                dice.insert(dice.find(L'D') + 1, std::to_wstring(right));
             }
 
-            if (match[3].first != match[3].second) {
+            if (match[4].first != match[4].second) {
                 EnableKeep = true;
-                if (match[4].first != match[4].second) {
-                    keep = std::stoi(match[4]);
+                if (match[5].first != match[5].second) {
+                    keep = std::stoi(match[5]);
                     if (keep <= 0 || keep > left) {
                         throw exception::dice_expression_invalid_error();
                     }
+                } else {
+                    dice += std::to_wstring(keep);
                 }
             }
 
@@ -130,7 +199,7 @@ namespace dice {
             std::vector<int> DiceResults;
             for (int k = 0; k != left; k++) {
                 int temp_res = gen(ran);
-                if (!EnableKeep || static_cast<int> (DiceResults.size()) < keep) {
+                if (!EnableKeep || static_cast<int>(DiceResults.size()) < keep) {
                     DiceResults.push_back(temp_res);
                 } else {
                     auto min_ele = std::min_element(DiceResults.begin(), DiceResults.end());
@@ -265,7 +334,7 @@ namespace dice {
             str += L"=" + res_display2;
         }
         std::wstring res = std::to_wstring(result);
-        res = res.substr(0, std::max(res.find(L'.'),std::min(res.find(L'.') + 3, res.find_last_not_of(L"0.") + 1)));
+        res = res.substr(0, std::max(res.find(L'.'), std::min(res.find(L'.') + 3, res.find_last_not_of(L"0.") + 1)));
         if (res != res_display2) {
             str += L"=" + res;
         }

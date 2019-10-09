@@ -4,6 +4,10 @@
 #include "cqsdk/types.h"
 
 namespace dice::utils {
+
+	// 默认面数获取
+    int get_defaultdice(const cq::Target& target);
+
     // 群名获取
     std::string get_groupname(const int64_t group_id);
 

@@ -6,6 +6,8 @@ project(coolq-cpp-sdk)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "/utf-8 ${CMAKE_CXX_FLAGS}")  # use UTF-8 source files
 set(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}")  # build with object level parallelism
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -31,8 +33,6 @@ add_compile_definitions(APP_ID=${APP_ID})
 find_package(unofficial-iconv CONFIG REQUIRED)
 find_package(SQLiteCpp CONFIG REQUIRED)
 find_package(sqlite3 CONFIG REQUIRED)
-
-include(FixLinkConflict)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 set(LIB_NAME "app")

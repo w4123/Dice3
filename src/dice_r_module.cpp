@@ -16,15 +16,15 @@ namespace dice {
         return std::regex_match(ws, re);
     }
     void r_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        std::wregex re(L"[ ]*[\\.。．][ ]*r(h)?[ ]*([0-9dk+\\-*/\\(\\)\\^]*)[ ]*(.*)",
+        std::wregex re(L"[ ]*[\\.。．][ ]*r(h)?[ ]*([0-9dk+\\-*/\\(\\)\\^bp]*)[ ]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         auto ret = std::regex_match(ws, m, re);
         std::wstring res;
         if (m[2].first != m[2].second) {
-            res = dice_calculator(m[2]).form_string();
+            res = dice_calculator(m[2], utils::get_defaultdice(e.target)).form_string();
         } else {
-            res = dice_calculator(L"d").form_string();
+            res = dice_calculator(L"d", utils::get_defaultdice(e.target)).form_string();
         }
 
         if (m[1].first == m[1].second) {

@@ -5,8 +5,19 @@
 #include "cqsdk/cqsdk.h"
 #include "cqsdk/types.h"
 #include "dice_msg.h"
+#include "SQLiteCpp/SQLiteCpp.h"
+#include "dice_db.h"
 
 namespace dice::utils {
+
+    int get_defaultdice(const cq::Target& target) {
+        SQLite::Statement st(*db::db, "SELECT default_dice FROM qq_info WHERE qq_id = ?");
+        st.bind(1, *target.user_id);
+        if (st.executeStep()) {
+            return st.getColumn(0).getInt();
+		}
+        return 100;
+    }
 
     std::string get_groupname(const int64_t group_id) {
         auto list = cq::api::get_group_list();
