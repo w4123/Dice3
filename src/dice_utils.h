@@ -4,6 +4,14 @@
 #include "cqsdk/types.h"
 
 namespace dice::utils {
+	// 设置jrrp
+    void set_jrrp(const cq::Target& target, int jrrp_val);
+
+	// 获取jrrp
+    std::tuple<bool, int> get_jrrp(const cq::Target& target);
+
+	// 获取今日日期
+	std::string get_date();
 
 	// 默认面数获取
     int get_defaultdice(const cq::Target& target);

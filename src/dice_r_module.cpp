@@ -21,8 +21,18 @@ namespace dice {
         std::wsmatch m;
         auto ret = std::regex_match(ws, m, re);
         std::wstring res;
-        if (m[2].first != m[2].second) {
-            res = dice_calculator(m[2], utils::get_defaultdice(e.target)).form_string();
+
+        std::wstring dice(m[2]);
+        std::wstring reason(m[3]);
+
+        // 如果骰子全是数字，那就当成原因
+        if (dice.find_first_not_of(L"0123456789") == dice.npos) {
+            reason = dice + reason;
+            dice = L"";
+        }
+
+        if (!dice.empty()) {
+            res = dice_calculator(dice, utils::get_defaultdice(e.target)).form_string();
         } else {
             res = dice_calculator(L"d", utils::get_defaultdice(e.target)).form_string();
         }
@@ -32,24 +42,20 @@ namespace dice {
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strRollDice"),
                                      std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)},
-                                                                        {"reason", cq::utils::ws2s(m[3])},
+                                                                        {"reason", cq::utils::ws2s(reason)},
                                                                         {"dice_expression", cq::utils::ws2s(res)}}));
         } else {
             cq::api::send_msg(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strHiddenDice"),
-                                     std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)}
-                                                                        }));
+                                     std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)}}));
             cq::api::send_private_msg(
                 *e.target.user_id,
                 utils::format_string(msg::GetGlobalMsg("strRollHiddenDice"),
                                      std::map<std::string, std::string>{{"origin", utils::get_originname(e.target)},
                                                                         {"nick", utils::get_nickname(e.target)},
-                                                                        {"reason", cq::utils::ws2s(m[3])},
+                                                                        {"reason", cq::utils::ws2s(reason)},
                                                                         {"dice_expression", cq::utils::ws2s(res)}}));
-
-        
-            
         }
     }
 } // namespace dice

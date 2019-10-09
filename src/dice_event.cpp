@@ -12,6 +12,7 @@
 #include "dice_r_module.h"
 #include "dice_help_module.h"
 #include "dice_set_module.h"
+#include "dice_jrrp_module.h"
 
 
 CQ_MAIN {
@@ -25,9 +26,11 @@ CQ_MAIN {
 
         static dice::bot_module BotModule;
 
-		static dice::help_module HelpModule;
+	static dice::help_module HelpModule;
 
-		static dice::set_module SetModule;
+	static dice::set_module SetModule;
+
+        static dice::jrrp_module JrrpModule;
 
         static dice::coc_module CocModule;
 

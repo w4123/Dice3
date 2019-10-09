@@ -23,7 +23,7 @@ namespace dice {
                 query = "default";
             } else {
                 query = cq::utils::ws2s(m[1]);
-			}
+	    }
             cq::api::send_msg(e.target, msg::GetHelpMsg(query));
             
         }

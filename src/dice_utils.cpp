@@ -2,20 +2,53 @@
 #include <map>
 #include <regex>
 #include <string>
+#include <tuple>
+#include "SQLiteCpp/SQLiteCpp.h"
 #include "cqsdk/cqsdk.h"
 #include "cqsdk/types.h"
-#include "dice_msg.h"
-#include "SQLiteCpp/SQLiteCpp.h"
 #include "dice_db.h"
+#include "dice_msg.h"
 
 namespace dice::utils {
+
+    std::string get_date() {
+        time_t raw_time;
+        time(&raw_time);
+        tm time_info{};
+        localtime_s(&time_info, &raw_time);
+        std::stringstream time_format;
+        time_format << std::put_time(&time_info, "%F");
+        return time_format.str();
+    }
+
+    void set_jrrp(const cq::Target& target, int jrrp_val) {
+        SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, jrrp_value, jrrp_date) VALUES (?, ?, ?)");
+        st.bind(1, *target.user_id);
+        st.bind(2, jrrp_val);
+        st.bind(3, get_date());
+        st.exec();
+    }
+
+    std::tuple<bool, int> get_jrrp(const cq::Target& target) {
+        SQLite::Statement st(*db::db, "SELECT jrrp_value, jrrp_date FROM qq_info WHERE qq_id = ?");
+        st.bind(1, *target.user_id);
+        if (st.executeStep()) {
+            if (st.getColumn(0).isNull() || st.getColumn(1).isNull()) return std::make_tuple(false, 0);
+
+            if (get_date() == st.getColumn(1).getString()) {
+                return std::make_tuple(true, st.getColumn(0).getInt());
+            }
+            return std::make_tuple(false, 0);
+        }
+        return std::make_tuple(false, 0);
+    }
 
     int get_defaultdice(const cq::Target& target) {
         SQLite::Statement st(*db::db, "SELECT default_dice FROM qq_info WHERE qq_id = ?");
         st.bind(1, *target.user_id);
         if (st.executeStep()) {
             return st.getColumn(0).getInt();
-		}
+        }
         return 100;
     }
 

@@ -24,13 +24,14 @@ namespace dice::msg {
         {"strRollHiddenDice", "在{origin}中 {nick} 投掷 {reason}: {dice_expression}"},
         {"strDefaultDiceErr", "错误: 默认骰无效"},
         {"strDefaultDice", "已将{nick}的默认骰设置为{dice}"},
-        {"strHelpNotFoundError", "未找到对应的帮助信息"}
+        {"strHelpNotFoundError", "未找到对应的帮助信息"},
+        {"strJrrp", "{nick}今天的人品值是: {jrrp_val}"}
 	};
 
     std::map<std::string, std::string> help_msg{
         {"default",
          "Dice! by 溯洄 Version 3 帮助\n输入.bot以获取版本信息\n输入.help "
-         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd bot help set"},
+         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd bot help(不包括on/off) set(不包括setcoc) jrrp(不包括on/off)"},
         {"license",
          "Dice! Version 3 使用MIT协议发布, 详细协议及使用的其他开源项目协议请见源代码\n源代码地址: "
          "https://github.com/w4123/Dice3"}};
