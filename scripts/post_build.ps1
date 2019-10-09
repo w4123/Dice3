@@ -12,7 +12,7 @@ $dllOutPath = "$appOutDir\$libName.dll"
 $jsonName = "$libName.json"
 $jsonOutPath = "$appOutDir\$jsonName"
 
-Move-Item -Force $outDir\$dllName $dllOutPath
+Copy-Item -Force $outDir\$dllName $dllOutPath
 Copy-Item -Force $projectDir\$jsonName $jsonOutPath
 
 if (Test-Path "$PSScriptRoot\install.ps1")
