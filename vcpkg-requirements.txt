@@ -2,4 +2,7 @@ sqlite3
 sqlitecpp
 boost-algorithm
 libiconv
+openssl
+brotli
+zlib
 cpprestsdk
