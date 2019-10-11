@@ -6,4 +6,6 @@ namespace dice::db
 {
     extern std::unique_ptr<SQLite::Database> db;
     void InitialiseDB();
+    void SemiReplaceDB();
+    void ReplaceDB();
 }

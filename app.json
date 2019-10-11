@@ -107,6 +107,14 @@
         }
     ],
     "menu": [
+	    {
+            "name": "半重置数据库",
+            "function": "menu_semi_replace_db"
+        },
+        {
+            "name": "重置数据库",
+            "function": "menu_replace_db"
+        }
     ],
     "status": [],
     "auth": [

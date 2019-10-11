@@ -3,6 +3,7 @@
 #include <string>
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "dice_db.h"
+#include "cpprest/asyncrt_utils.h"
 
 namespace dice::msg {
     std::string dice_ver = "3.0.0alpha";
@@ -10,6 +11,7 @@ namespace dice::msg {
     std::string dice_info = "Dice! by 溯洄 Version " + dice_ver + "(" + std::to_string(dice_build) + ")";
     std::string dice_full_info =
         dice_info + " [MSVC " + std::to_string(_MSC_FULL_VER) + " " + __DATE__ + " " + __TIME__ + "]";
+    utility::string_t dice_user_agent = utility::conversions::to_string_t("Dice/" + dice_ver);
     std::map<std::string, std::string> global_msg{
         {"strRollDice", "{nick} 投掷 {reason}: {dice_expression}"},
         {"strInvalidDiceError", "错误: 不合法的掷骰表达式"},
@@ -25,6 +27,8 @@ namespace dice::msg {
         {"strDefaultDiceErr", "错误: 默认骰无效"},
         {"strDefaultDice", "已将{nick}的默认骰设置为{dice}"},
         {"strHelpNotFoundError", "未找到对应的帮助信息"},
+        {"strRulesNotFoundError", "未找到对应的规则信息"},
+        {"strParaEmptyError", "错误: 关键参数为空, 请查看对应命令的帮助信息"},
         {"strJrrp", "{nick}今天的人品值是: {jrrp_val}"}
 	};
 

@@ -8,27 +8,31 @@
 #include "dice_coc_module.h"
 #include "dice_db.h"
 #include "dice_dnd_module.h"
+#include "dice_help_module.h"
+#include "dice_jrrp_module.h"
 #include "dice_module.h"
 #include "dice_r_module.h"
-#include "dice_help_module.h"
+#include "dice_rules_module.h"
 #include "dice_set_module.h"
-#include "dice_jrrp_module.h"
-
 
 CQ_MAIN {
     // 应用启用时调用，进行模块启用
     cq::app::on_enable = [] {
         // 连接数据库
         dice::db::db = std::make_unique<SQLite::Database>(
-            cq::api::get_app_directory() + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",  SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE, 3000);
+            cq::api::get_app_directory() + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",
+            SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE,
+            3000);
 
         dice::db::InitialiseDB();
 
         static dice::bot_module BotModule;
 
-	static dice::help_module HelpModule;
+        static dice::help_module HelpModule;
 
-	static dice::set_module SetModule;
+        static dice::rules_module RulesModule;
+
+        static dice::set_module SetModule;
 
         static dice::jrrp_module JrrpModule;
 
@@ -49,6 +53,10 @@ CQ_MAIN {
 
         // 转换为宽字符串，用于正则匹配
         std::wstring ws = cq::utils::s2ws(e.message.extract_plain_text());
+
+        std::wregex re(L"[ ]*[\\.。．].*");
+
+        if (!std::regex_match(ws, re)) return;
 
         // 遍历已启用的模块，对消息进行匹配
         dice::dice_module *process_module = nullptr;
@@ -79,3 +87,15 @@ CQ_MAIN {
     cq::app::on_disable = [] { dice::db::db = nullptr; };
     cq::app::on_coolq_exit = [] { dice::db::db = nullptr; };
 }
+
+CQ_MENU(menu_semi_replace_db)
+{
+    dice::db::SemiReplaceDB();
+    MessageBoxW(nullptr, L"操作\"半重置数据库\"已完成", L"Dice!", MB_OK | MB_ICONINFORMATION);
+}
+CQ_MENU(menu_replace_db)
+{
+    dice::db::ReplaceDB();
+    MessageBoxW(nullptr, L"操作\"重置数据库\"已完成", L"Dice!", MB_OK | MB_ICONINFORMATION);
+}
+    

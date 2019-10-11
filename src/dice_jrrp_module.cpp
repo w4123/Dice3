@@ -24,14 +24,20 @@ namespace dice {
             return;
         }
 
+        // 请求Client
         web::http::client::http_client http_client(U("http://api.kokona.tech:5555/"));
+        // POST数据
         const utf8string data = "QQ=" + std::to_string(cq::api::get_login_user_id()) + "&v=20190114"
                                 + "&QueryQQ=" + std::to_string(*e.target.user_id);
-        web::http::http_response response =
-            http_client
-                .request(web::http::methods::POST, "/jrrp", data, "application/x-www-form-urlencoded;charset=utf-8")
-                .get();
-
+        // 设置请求参数
+        web::http::http_request req(web::http::methods::POST);
+        req.set_request_uri(U("/jrrp"));
+        req.set_body(data, "application/x-www-form-urlencoded;charset=utf-8");
+        // 设置UA
+        req.headers().add(U("User-Agent"), msg::dice_user_agent);
+        // 发起异步请求，堵塞等待结果
+        web::http::http_response response = http_client.request(req).get();
+        // 获取结果
         auto jrrp_val_str = response.extract_utf8string(true).get();
         cq::api::send_msg(e.target,
                           utils::format_string(msg::GetGlobalMsg("strJrrp"),

@@ -26,7 +26,7 @@ namespace dice {
         std::wstring reason(m[3]);
 
         // 如果骰子全是数字，那就当成原因
-        if (dice.find_first_not_of(L"0123456789") == dice.npos) {
+        if (dice.find_first_not_of(L"0123456789") == std::wstring::npos) {
             reason = dice + reason;
             dice = L"";
         }
