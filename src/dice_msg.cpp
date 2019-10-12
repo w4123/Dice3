@@ -35,7 +35,7 @@ namespace dice::msg {
     std::map<std::string, std::string> help_msg{
         {"default",
          "Dice! by 溯洄 Version 3 帮助\n输入.bot以获取版本信息\n输入.help "
-         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd bot help(不包括on/off) set(不包括setcoc) jrrp(不包括on/off)"},
+         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd bot help(不包括on/off) set(不包括setcoc) jrrp(不包括on/off) rules"},
         {"license",
          "Dice! Version 3 使用MIT协议发布, 详细协议及使用的其他开源项目协议请见源代码\n源代码地址: "
          "https://github.com/w4123/Dice3"}};

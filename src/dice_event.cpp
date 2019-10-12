@@ -72,10 +72,12 @@ CQ_MAIN {
             e.block();
             try {
                 process_module->process(e, ws);
-            } catch (std::exception &ex) {
-                cq::api::send_msg(e.target, ex.what());
+            } catch (const cq::exception::ApiError &ex) {
                 cq::logging::debug("Dice! V3", ex.what());
-            }
+            } catch (const std::exception &ex) {
+                cq::logging::debug("Dice! V3", ex.what());
+                cq::api::send_msg(e.target, ex.what());
+			}
         }
     };
 
@@ -88,14 +90,11 @@ CQ_MAIN {
     cq::app::on_coolq_exit = [] { dice::db::db = nullptr; };
 }
 
-CQ_MENU(menu_semi_replace_db)
-{
+CQ_MENU(menu_semi_replace_db) {
     dice::db::SemiReplaceDB();
     MessageBoxW(nullptr, L"操作\"半重置数据库\"已完成", L"Dice!", MB_OK | MB_ICONINFORMATION);
 }
-CQ_MENU(menu_replace_db)
-{
+CQ_MENU(menu_replace_db) {
     dice::db::ReplaceDB();
     MessageBoxW(nullptr, L"操作\"重置数据库\"已完成", L"Dice!", MB_OK | MB_ICONINFORMATION);
 }
-    
