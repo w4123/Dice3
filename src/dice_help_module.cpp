@@ -1,4 +1,5 @@
 #include "dice_help_module.h"
+#include <SQLiteCpp/Statement.h>
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
 #include "dice_exception.h"
@@ -18,14 +19,27 @@ namespace dice {
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
-            std::string query;
-            if (m[1].first == m[1].second) {
-                query = "default";
+            std::wstring origin_query(m[1]);
+            std::transform(origin_query.begin(), origin_query.end(), origin_query.begin(), std::towlower);
+            if (origin_query == L"on") {
+                utils::set_help_enabled(e.target, true);
+                cq::api::send_msg(e.target, msg::GetGlobalMsg("strSetHelpEnabled"));
+            } else if (origin_query == L"off") {
+                utils::set_help_enabled(e.target, false);
+                cq::api::send_msg(e.target, msg::GetGlobalMsg("strSetHelpDisabled"));
             } else {
-                query = cq::utils::ws2s(m[1]);
-	    }
-            cq::api::send_msg(e.target, msg::GetHelpMsg(query));
-            
+                if (!utils::is_help_enabled(e.target)) {
+                    cq::api::send_msg(e.target, msg::GetGlobalMsg("strHelpDisabled"));
+                    return;
+                }
+                std::string query;
+                if (origin_query.empty()) {
+                    query = "default";
+                } else {
+                    query = cq::utils::ws2s(origin_query);
+                }
+                cq::api::send_msg(e.target, msg::GetHelpMsg(query));
+            }
         }
     }
 } // namespace dice

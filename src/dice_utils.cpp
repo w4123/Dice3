@@ -11,7 +11,80 @@
 #include "dice_msg.h"
 
 namespace dice::utils {
+    void set_jrrp_enabled(const cq::Target& target, const bool enabled) {
+        if (target.group_id.has_value()) {
+            set_jrrp_enabled(*target.group_id, 0, enabled);
+        } else if (target.discuss_id.has_value()) {
+            set_jrrp_enabled(*target.discuss_id, 1, enabled);
+        } else {
+            throw exception::exception(msg::GetGlobalMsg("strCommandNotAvailableError"));
+        }
+    }
 
+    void set_jrrp_enabled(const int64_t group_id, const int type, const bool enabled) {
+        SQLite::Statement st(*db::db, "REPLACE INTO group_info(group_id, type, jrrp_on) VALUES(?, ?, ?)");
+        st.bind(1, group_id);
+        st.bind(2, type);
+        st.bind(3, enabled);
+        st.exec();
+    }
+
+    bool is_jrrp_enabled(const int64_t group_id, const int type) {
+        SQLite::Statement st(*db::db, "SELECT jrrp_on FROM group_info WHERE group_id=? and type=?");
+        st.bind(1, group_id);
+        st.bind(2, type);
+        if (st.executeStep()) {
+            return st.getColumn(0).getInt();
+        }
+        return true;
+    }
+
+    bool is_jrrp_enabled(const cq::Target& target) {
+        if (target.group_id.has_value()) {
+            return is_jrrp_enabled(*target.group_id, 0);
+        }
+        if (target.discuss_id.has_value()) {
+            return is_jrrp_enabled(*target.discuss_id, 1);
+        }
+        return true;
+    }
+    void set_help_enabled(const cq::Target& target, const bool enabled) {
+        if (target.group_id.has_value()) {
+            set_help_enabled(*target.group_id, 0, enabled);
+        } else if (target.discuss_id.has_value()) {
+            set_help_enabled(*target.discuss_id, 1, enabled);
+        } else {
+            throw exception::exception(msg::GetGlobalMsg("strCommandNotAvailableError"));
+        }
+    }
+
+    void set_help_enabled(const int64_t group_id, const int type, const bool enabled) {
+        SQLite::Statement st(*db::db, "REPLACE INTO group_info(group_id, type, help_on) VALUES(?, ?, ?)");
+        st.bind(1, group_id);
+        st.bind(2, type);
+        st.bind(3, enabled);
+        st.exec();
+    }
+
+    bool is_help_enabled(const int64_t group_id, const int type) {
+        SQLite::Statement st(*db::db, "SELECT help_on FROM group_info WHERE group_id=? and type=?");
+        st.bind(1, group_id);
+        st.bind(2, type);
+        if (st.executeStep()) {
+            return st.getColumn(0).getInt();
+        }
+        return true;
+    }
+
+    bool is_help_enabled(const cq::Target& target) {
+        if (target.group_id.has_value()) {
+            return is_help_enabled(*target.group_id, 0);
+        }
+        if (target.discuss_id.has_value()) {
+            return is_help_enabled(*target.discuss_id, 1);
+        }
+        return true;
+    }
     std::string get_date() {
         time_t raw_time;
         time(&raw_time);
@@ -148,7 +221,7 @@ namespace dice::utils {
             } else if (target.discuss_id.has_value()) {
                 set_group_nickname(*target.discuss_id, *target.user_id, 1, nick_name);
             } else {
-                throw exception::exception(msg::GetGlobalMsg("strNNPrivateError"));
+                throw exception::exception(msg::GetGlobalMsg("strCommandNotAvailableError"));
             }
 
         } else {
@@ -171,7 +244,6 @@ namespace dice::utils {
         } else {
             throw exception::exception(msg::GetGlobalMsg("strSetNicknameError"));
         }
-        
     }
 
     // 格式化字符串

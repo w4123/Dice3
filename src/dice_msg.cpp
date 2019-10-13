@@ -31,15 +31,21 @@ namespace dice::msg {
         {"strParaEmptyError", "错误: 关键参数为空, 请查看对应命令的帮助信息"},
         {"strJrrp", "{nick}今天的人品值是: {jrrp_val}"},
         {"strSetNicknameError", "内部错误: 无法设置昵称"},
-        {"strNNPrivateError", "错误: .nn命令仅可在群/讨论组中使用, 欲设置全局昵称请使用.n命令"},
+        {"strCommandNotAvailableError", "错误: 此命令仅可在群/讨论组中使用"},
         {"strNickSet", "已将{old_nick}的{is_global}昵称修改为{new_nick}"},
-        {"strNickEmpty", "已将{old_nick}的{is_global}昵称删除"}};
+        {"strNickEmpty", "已将{old_nick}的{is_global}昵称删除"},
+        {"strSetHelpEnabled", "已启用本群/讨论组的Help功能"},
+        {"strSetHelpDisabled", "已禁用本群/讨论组的Help功能"},
+        {"strSetJrrpEnabled", "已启用本群/讨论组的Jrrp功能"},
+        {"strSetJrrpDisabled", "已禁用本群/讨论组的Jrrp功能"},
+        {"strHelpDisabled", "在本群/讨论组中Help功能已被禁用"},
+        {"strJrrpDisabled", "在本群/讨论组中Jrrp功能已被禁用"}};
 
     std::map<std::string, std::string> help_msg{
         {"default",
          "Dice! by 溯洄 Version 3 帮助\n输入.bot以获取版本信息\n输入.help "
-         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd "
-         "bot help(不包括on/off) set(不包括setcoc) jrrp(不包括on/off) rules dismiss n/nn"},
+         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb, 不包括rf) coc dnd "
+         "bot help set(不包括setcoc) jrrp rules dismiss n/nn"},
         {"license",
          "Dice! Version 3 使用MIT协议发布, 详细协议及使用的其他开源项目协议请见源代码\n源代码地址: "
          "https://github.com/w4123/Dice3"}};

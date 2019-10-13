@@ -69,8 +69,10 @@ namespace dice::db {
 
     void ReplaceDB() {
         db = nullptr;
-        std::filesystem::remove(cq::api::get_app_directory() + "DiceConfig_"
-                                + std::to_string(cq::api::get_login_user_id()) + ".db");
+        if (!std::filesystem::remove(cq::utils::s2ws(cq::api::get_app_directory() + "DiceConfig_"
+                                     + std::to_string(cq::api::get_login_user_id()) + ".db"))) {
+            cq::logging::debug("Dice! V3", "Unable to Remove database");
+        }
         db = std::make_unique<SQLite::Database>(
             cq::api::get_app_directory() + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",
             SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE,
