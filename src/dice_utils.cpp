@@ -7,6 +7,7 @@
 #include "cqsdk/cqsdk.h"
 #include "cqsdk/types.h"
 #include "dice_db.h"
+#include "dice_exception.h"
 #include "dice_msg.h"
 
 namespace dice::utils {
@@ -72,27 +73,105 @@ namespace dice::utils {
         return "私聊会话";
     }
 
-    // 昵称获取 群
-    std::string get_nickname(const int64_t group_id, const int64_t user_id) {
-        const cq::GroupMember gm = cq::api::get_group_member_info(group_id, user_id);
-        if (!gm.card.empty()) {
-            return gm.card;
+    // 昵称获取 群/讨论组 type=0代表群， type=1代表讨论组
+    std::string get_nickname(const int64_t group_id, const int64_t user_id, const int type) {
+        SQLite::Statement st(*db::db, "SELECT nick_name FROM group_user_info WHERE group_id=? AND qq_id=? AND type=?");
+        st.bind(1, group_id);
+        st.bind(2, user_id);
+        st.bind(3, type);
+        if (st.executeStep()) {
+            if (!st.getColumn(0).isNull() && !st.getColumn(0).getString().empty()) {
+                return st.getColumn(0).getString();
+            }
         }
-        return gm.nickname;
+        SQLite::Statement st1(*db::db, "SELECT nick_name FROM qq_info WHERE qq_id=?");
+        st1.bind(1, user_id);
+        if (st1.executeStep()) {
+            if (!st1.getColumn(0).isNull() && !st1.getColumn(0).getString().empty()) {
+                return st1.getColumn(0).getString();
+            }
+        }
+
+        if (type == 0) {
+            const cq::GroupMember gm = cq::api::get_group_member_info(group_id, user_id);
+            if (!gm.card.empty()) {
+                return gm.card;
+            }
+            return gm.nickname;
+        }
+        return cq::api::get_stranger_info(user_id).nickname;
     }
 
-    // 昵称获取 讨论组/私聊
-    std::string get_nickname(const int64_t user_id) { return cq::api::get_stranger_info(user_id).nickname; }
+    // 昵称获取 私聊
+    std::string get_nickname(const int64_t user_id) {
+        SQLite::Statement st(*db::db, "SELECT nick_name FROM qq_info WHERE qq_id=?");
+        st.bind(1, user_id);
+        if (st.executeStep()) {
+            if (!st.getColumn(0).isNull() && !st.getColumn(0).getString().empty()) {
+                return st.getColumn(0).getString();
+            }
+        }
+        return cq::api::get_stranger_info(user_id).nickname;
+    }
 
     // 昵称获取 综合
     std::string get_nickname(const cq::Target& target) {
         if (target.user_id.has_value()) {
             if (target.group_id.has_value()) {
-                return get_nickname(*target.group_id, *target.user_id);
+                return get_nickname(*target.group_id, *target.user_id, 0);
+            }
+            if (target.discuss_id.has_value()) {
+                return get_nickname(*target.discuss_id, *target.user_id, 1);
             }
             return get_nickname(*target.user_id);
         }
         return msg::GetGlobalMsg("strNicknameError");
+    }
+
+    // 设置群昵称
+    void set_group_nickname(const int64_t group_id, const int64_t user_id, const int type,
+                            const std::string& nick_name) {
+        SQLite::Statement st(*db::db,
+                             "REPLACE INTO group_user_info(group_id, qq_id, type, nick_name) VALUES(?, ?, ?, ?)");
+        st.bind(1, group_id);
+        st.bind(2, user_id);
+        st.bind(3, type);
+        st.bind(4, nick_name);
+        st.exec();
+    }
+
+    // 设置群昵称
+    void set_group_nickname(const cq::Target& target, const std::string& nick_name) {
+        if (target.user_id.has_value()) {
+            if (target.group_id.has_value()) {
+                set_group_nickname(*target.group_id, *target.user_id, 0, nick_name);
+            } else if (target.discuss_id.has_value()) {
+                set_group_nickname(*target.discuss_id, *target.user_id, 1, nick_name);
+            } else {
+                throw exception::exception(msg::GetGlobalMsg("strNNPrivateError"));
+            }
+
+        } else {
+            throw exception::exception(msg::GetGlobalMsg("strSetNicknameError"));
+        }
+    }
+
+    // 设置全局昵称
+    void set_global_nickname(const int64_t user_id, const std::string& nick_name) {
+        SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, nick_name) VALUES(?, ?)");
+        st.bind(1, user_id);
+        st.bind(2, nick_name);
+        st.exec();
+    }
+
+    // 设置全局昵称
+    void set_global_nickname(const cq::Target& target, const std::string& nick_name) {
+        if (target.user_id.has_value()) {
+            set_global_nickname(*target.user_id, nick_name);
+        } else {
+            throw exception::exception(msg::GetGlobalMsg("strSetNicknameError"));
+        }
+        
     }
 
     // 格式化字符串

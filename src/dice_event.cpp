@@ -14,6 +14,8 @@
 #include "dice_r_module.h"
 #include "dice_rules_module.h"
 #include "dice_set_module.h"
+#include "dice_dismiss_module.h"
+#include "dice_nickname_module.h"
 
 CQ_MAIN {
     // 应用启用时调用，进行模块启用
@@ -25,8 +27,11 @@ CQ_MAIN {
             3000);
 
         dice::db::InitialiseDB();
+        static dice::dismiss_module DismissModule;
 
         static dice::bot_module BotModule;
+
+        static dice::nickname_module NicknameModule;
 
         static dice::help_module HelpModule;
 

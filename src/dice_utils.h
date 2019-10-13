@@ -22,14 +22,27 @@ namespace dice::utils {
     // 来源获取
     std::string get_originname(const cq::Target& target);
 
-    // 昵称获取 群
-    std::string get_nickname(const int64_t group_id, const int64_t user_id);
+    // 昵称获取 群/讨论组 type=0为群， type=1为讨论组
+    std::string get_nickname(const int64_t group_id, const int64_t user_id, const int type);
 
-    // 昵称获取 讨论组/私聊
+    // 昵称获取 私聊
     std::string get_nickname(const int64_t user_id);
 
     // 昵称获取 综合
     std::string get_nickname(const cq::Target& target);
+
+	// 设置群昵称
+	void set_group_nickname(const cq::Target& target, const std::string& nick_name);
+
+	// 设置群昵称
+	void set_group_nickname(const int64_t group_id, const int64_t user_id, const int type,
+                                const std::string& nick_name);
+
+	// 设置全局昵称
+	void set_global_nickname(const cq::Target& target, const std::string& nick_name);
+        
+	// 设置全局昵称
+	void set_global_nickname(const int64_t user_id, const std::string& nick_name);
 
     // 格式化字符串
     std::string format_string(const std::string& origin_str, const std::map<std::string, std::string>& format_para);

@@ -2,8 +2,8 @@
 #include <map>
 #include <string>
 #include "SQLiteCpp/SQLiteCpp.h"
-#include "dice_db.h"
 #include "cpprest/asyncrt_utils.h"
+#include "dice_db.h"
 
 namespace dice::msg {
     std::string dice_ver = "3.0.0alpha";
@@ -29,13 +29,17 @@ namespace dice::msg {
         {"strHelpNotFoundError", "未找到对应的帮助信息"},
         {"strRulesNotFoundError", "未找到对应的规则信息"},
         {"strParaEmptyError", "错误: 关键参数为空, 请查看对应命令的帮助信息"},
-        {"strJrrp", "{nick}今天的人品值是: {jrrp_val}"}
-	};
+        {"strJrrp", "{nick}今天的人品值是: {jrrp_val}"},
+        {"strSetNicknameError", "内部错误: 无法设置昵称"},
+        {"strNNPrivateError", "错误: .nn命令仅可在群/讨论组中使用, 欲设置全局昵称请使用.n命令"},
+        {"strNickSet", "已将{old_nick}的{is_global}昵称修改为{new_nick}"},
+        {"strNickEmpty", "已将{old_nick}的{is_global}昵称删除"}};
 
     std::map<std::string, std::string> help_msg{
         {"default",
          "Dice! by 溯洄 Version 3 帮助\n输入.bot以获取版本信息\n输入.help "
-         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd bot help(不包括on/off) set(不包括setcoc) jrrp(不包括on/off) rules"},
+         "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括rp rb) coc dnd "
+         "bot help(不包括on/off) set(不包括setcoc) jrrp(不包括on/off) rules dismiss n/nn"},
         {"license",
          "Dice! Version 3 使用MIT协议发布, 详细协议及使用的其他开源项目协议请见源代码\n源代码地址: "
          "https://github.com/w4123/Dice3"}};
@@ -46,7 +50,7 @@ namespace dice::msg {
         if (st.executeStep()) {
             return st.getColumn(0).getString();
         }
-        return "数据库信息获取错误";
+        return "内部错误: 数据库信息获取错误";
     }
 
     std::string GetHelpMsg(const std::string& str) {

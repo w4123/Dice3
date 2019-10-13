@@ -68,14 +68,15 @@ namespace dice {
         }
     }
     void bot_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        std::wregex re(L"[ ]*[\\.。．][ ]*bot[ ]*(on|off)?[ ]*([0-9]*).*",
+        std::wregex re(L"[ ]*[\\.。．][ ]*bot[ ]*(on|off)?[ ]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
             std::wstring command = m[1];
             std::wstring target = m[2];
             std::wstring self_id = std::to_wstring(cq::api::get_login_user_id());
-            if (target.empty() || target == self_id || target == self_id.substr(self_id.length() - 4)) {
+            if (target.empty() || target == self_id || target == self_id.substr(self_id.length() - 4)
+                || target == cq::utils::s2ws(cq::api::get_login_nickname())) {
                 if (command == L"on") {
                     if (e.message_type == cq::message::GROUP && !utils::is_admin_or_owner(e.target)) {
                         cq::api::send_msg(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
