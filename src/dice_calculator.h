@@ -19,8 +19,9 @@ namespace dice {
         dice_calculator(std::wstring dice_expression);
         dice_calculator(std::wstring dice_expression, int default_dice);
 
+		static std::mt19937 ran;
+
     private:
-        static std::mt19937 dice_calculator::ran;
         std::stack<double> num_stk;
         std::stack<wchar_t> operator_stk;
         const int default_dice = 100;
