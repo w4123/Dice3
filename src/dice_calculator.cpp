@@ -132,7 +132,6 @@ namespace dice {
                 std::uniform_int_distribution<int> gen10(1, 10);
                 int first_res = gen100(ran);
                 std::vector<int> bpTempStorage;
-                int res = 0;
 
                 if (first_res % 10) {
                     for (int k = 0; k != DiceCount; ++k) {

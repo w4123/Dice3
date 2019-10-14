@@ -1,7 +1,5 @@
 #include "dice_dismiss_module.h"
-#include "SQLiteCpp/SQLiteCpp.h"
 #include "cqsdk/cqsdk.h"
-#include "dice_db.h"
 #include "dice_msg.h"
 #include "dice_utils.h"
 

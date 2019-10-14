@@ -1,7 +1,5 @@
 #include "dice_echo_module.h"
 #include "cqsdk/cqsdk.h"
-#include <algorithm>
-#include <vector>
 
 namespace cq::event {
     struct MessageEvent;

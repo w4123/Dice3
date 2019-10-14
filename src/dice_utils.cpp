@@ -300,7 +300,7 @@ namespace dice::utils {
                     for (auto ii = word_begin; ii != word_end; ii++) {
                         choose_vec.push_back((*ii)[0]);
                     }
-                    if (choose_vec.size() == 0) {
+                    if (choose_vec.empty()) {
                         throw exception::exception(msg::GetGlobalMsg("strFormatStrInvalidError"));
                     }
                     new_str +=

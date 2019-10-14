@@ -1,7 +1,6 @@
 #include "dice_help_module.h"
 #include <SQLiteCpp/Statement.h>
 #include "cqsdk/cqsdk.h"
-#include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
 

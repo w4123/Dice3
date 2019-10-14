@@ -3,7 +3,6 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_rules_module.h"
-#include "dice_utils.h"
 
 namespace cq::event {
     struct MessageEvent;

@@ -1,10 +1,7 @@
 #include "dice_fmt_module.h"
-#include "SQLiteCpp/SQLiteCpp.h"
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
-#include "dice_exception.h"
 #include "dice_utils.h"
-#include "dice_db.h"
 
 namespace cq::event {
     struct MessageEvent;
