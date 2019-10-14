@@ -10,8 +10,7 @@
 
 namespace dice {
     // 构造函数，将模块加入启用模块列表
-    dice_module::dice_module()
-    {
+    dice_module::dice_module() {
         enabled_modules.push_back(this);
     }
 
@@ -22,5 +21,6 @@ namespace dice {
             enabled_modules.erase(find_res);
         }
     }
+
     std::vector<dice_module*> dice_module::enabled_modules;
 } // namespace dice

@@ -9,11 +9,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool dnd_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool dnd_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*dnd.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void dnd_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void dnd_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*dnd[ ]*([0-9]*).*",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -39,7 +40,7 @@ namespace dice {
                 for (int i = 0; i != 6; i++) {
                     CharacterCards += strProperty[i];
                     CharacterCards += ":";
-                    int RollRes = static_cast<int> (dice_calculator(L"4D6K3").result);
+                    int RollRes = static_cast<int>(dice_calculator(L"4D6K3").result);
                     AllTotal += RollRes;
                     CharacterCards += std::to_string(RollRes);
                     CharacterCards += " ";
@@ -55,9 +56,11 @@ namespace dice {
             cq::api::send_msg(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strCharacterCard"),
-                                     std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)},
-                                                                        {"version", "DND"},
-                                                                        {"character_cards", CharacterCards}}));
+                                     std::map<std::string, std::string>{
+                                         {"nick", utils::get_nickname(e.target)},
+                                         {"version", "DND"},
+                                         {"character_cards", CharacterCards}
+                                     }));
         }
     }
 } // namespace dice

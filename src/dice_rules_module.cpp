@@ -10,11 +10,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool rules_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool rules_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*rules.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void rules_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void rules_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*rules[ ]*(?:([a-z0-9]*)(?::|：))?[ ]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;

@@ -10,9 +10,8 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool dismiss_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
-        if (e.message_type==cq::message::PRIVATE)
-        {
+    bool dismiss_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
+        if (e.message_type == cq::message::PRIVATE) {
             return false;
         }
         std::wregex re(L"[ ]*[\\.。．][ ]*dismiss.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
@@ -20,7 +19,7 @@ namespace dice {
 
     }
 
-    void dismiss_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    void dismiss_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*dismiss[ ](.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -29,8 +28,8 @@ namespace dice {
             std::wstring self_id = std::to_wstring(cq::api::get_login_user_id());
             if (target.empty() || target == self_id || target == self_id.substr(self_id.length() - 4)
                 || target == cq::utils::s2ws(cq::api::get_login_nickname())) {
-                
-	        if (e.message_type == cq::message::GROUP) {
+
+                if (e.message_type == cq::message::GROUP) {
                     if (!utils::is_admin_or_owner(e.target)) {
                         cq::api::send_msg(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
                         return;

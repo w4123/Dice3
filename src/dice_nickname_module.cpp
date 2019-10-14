@@ -11,11 +11,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool nickname_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool nickname_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*n.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void nickname_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void nickname_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*n(n)?[ ]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -31,14 +32,18 @@ namespace dice {
             if (nick_name.empty()) {
                 cq::api::send_msg(e.target,
                                   utils::format_string(msg::GetGlobalMsg("strNickEmpty"),
-                                                       {{"old_nick", old_nick},
-                                                        {"is_global", m[1].first == m[1].second ? "全局" : ""}}));
+                                                       {
+                                                           {"old_nick", old_nick},
+                                                           {"is_global", m[1].first == m[1].second ? "全局" : ""}
+                                                       }));
             } else {
                 cq::api::send_msg(e.target,
                                   utils::format_string(msg::GetGlobalMsg("strNickSet"),
-                                                       {{"old_nick", old_nick},
-                                                        {"new_nick", nick_name},
-                                                        {"is_global", m[1].first == m[1].second ? "全局" : ""}}));
+                                                       {
+                                                           {"old_nick", old_nick},
+                                                           {"new_nick", nick_name},
+                                                           {"is_global", m[1].first == m[1].second ? "全局" : ""}
+                                                       }));
             }
         }
     }

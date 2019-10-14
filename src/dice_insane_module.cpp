@@ -11,11 +11,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool insane_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool insane_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*(?:ti|li).*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void insane_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void insane_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*(ti|li).*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
@@ -30,9 +31,11 @@ namespace dice {
             cq::api::send_msg(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strInsane"),
-                                                   {{"nick", utils::get_nickname(e.target)},
-                                                    {"insane_type", insane_type == L"ti"? "即时":"总结"},
-                                                    {"insane_str", insane_str}}));
+                                     {
+                                         {"nick", utils::get_nickname(e.target)},
+                                         {"insane_type", insane_type == L"ti" ? "即时" : "总结"},
+                                         {"insane_str", insane_str}
+                                     }));
         }
     }
 } // namespace dice

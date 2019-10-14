@@ -11,11 +11,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool set_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool set_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*set.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void set_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void set_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*set[ ]*([0-9]*).*",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -34,11 +35,11 @@ namespace dice {
             cq::api::send_msg(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strDefaultDice"),
-									{
-										{"nick", utils::get_nickname(e.target)}, 
-										{"dice", "D" + std::to_string(SetDice)}
-									}
-            ));
+                                     {
+                                         {"nick", utils::get_nickname(e.target)},
+                                         {"dice", "D" + std::to_string(SetDice)}
+                                     }
+                ));
         }
     }
 } // namespace dice

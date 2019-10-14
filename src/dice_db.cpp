@@ -35,8 +35,8 @@ namespace dice::db {
             "NOT NULL, nick_name TEXT, card_chosen TEXT DEFAULT \"default\", PRIMARY KEY(qq_id, group_id, type))");
         db->exec("CREATE TABLE IF NOT EXISTS global_msg (title TEXT PRIMARY KEY NOT NULL, val TEXT NOT NULL)");
         db->exec("CREATE TABLE IF NOT EXISTS help_msg (title TEXT PRIMARY KEY NOT NULL, val TEXT NOT NULL)");
-        if (db->execAndGet("SELECT count(*) FROM sqlite_master WHERE type = \"table\" AND name = \"deck\"").getInt()==0)
-        {
+        if (db->execAndGet("SELECT count(*) FROM sqlite_master WHERE type = \"table\" AND name = \"deck\"").getInt() ==
+            0) {
             db->exec(
                 "CREATE TABLE deck(name TEXT NOT NULL, content TEXT NOT NULL, origin TEXT NOT NULL "
                 "DEFAULT "
@@ -44,8 +44,8 @@ namespace dice::db {
             db->exec("CREATE INDEX idx_name ON deck(name)");
             db->exec("CREATE INDEX idx_ori ON deck(origin)");
 
-            for (const auto& msg : msg::default_deck) {
-                for (const auto& item : msg.second) {
+            for (const auto &msg : msg::default_deck) {
+                for (const auto &item : msg.second) {
                     SQLite::Statement st(*db, "INSERT INTO deck(name, content) VALUES(?, ?)");
                     st.bind(1, msg.first);
                     st.bind(2, item);
@@ -54,14 +54,13 @@ namespace dice::db {
             }
         }
 
-
-        for (const auto& msg : msg::global_msg) {
+        for (const auto &msg : msg::global_msg) {
             SQLite::Statement st(*db, "INSERT OR IGNORE INTO global_msg(title, val) VALUES(?, ?)");
             st.bind(1, msg.first);
             st.bind(2, msg.second);
             st.exec();
         }
-        for (const auto& msg : msg::help_msg) {
+        for (const auto &msg : msg::help_msg) {
             SQLite::Statement st(*db, "INSERT OR IGNORE INTO help_msg(title, val) VALUES(?, ?)");
             st.bind(1, msg.first);
             st.bind(2, msg.second);
@@ -72,13 +71,13 @@ namespace dice::db {
 
     void SemiReplaceDB() {
         SQLite::Transaction tran(*db);
-        for (const auto& msg : msg::global_msg) {
+        for (const auto &msg : msg::global_msg) {
             SQLite::Statement st(*db, "REPLACE INTO global_msg(title, val) VALUES(?, ?)");
             st.bind(1, msg.first);
             st.bind(2, msg.second);
             st.exec();
         }
-        for (const auto& msg : msg::help_msg) {
+        for (const auto &msg : msg::help_msg) {
             SQLite::Statement st(*db, "REPLACE INTO help_msg(title, val) VALUES(?, ?)");
             st.bind(1, msg.first);
             st.bind(2, msg.second);
@@ -92,8 +91,8 @@ namespace dice::db {
         db->exec("CREATE INDEX idx_name ON deck(name)");
         db->exec("CREATE INDEX idx_ori ON deck(origin)");
 
-        for (const auto& msg : msg::default_deck) {
-            for (const auto& item : msg.second) {
+        for (const auto &msg : msg::default_deck) {
+            for (const auto &item : msg.second) {
                 SQLite::Statement st(*db, "INSERT OR IGNORE INTO deck(name, content) VALUES(?, ?)");
                 st.bind(1, msg.first);
                 st.bind(2, item);

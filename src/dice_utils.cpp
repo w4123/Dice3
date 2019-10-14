@@ -13,7 +13,7 @@
 #include "random"
 
 namespace dice::utils {
-    void set_jrrp_enabled(const cq::Target& target, const bool enabled) {
+    void set_jrrp_enabled(const cq::Target &target, const bool enabled) {
         if (target.group_id.has_value()) {
             set_jrrp_enabled(*target.group_id, 0, enabled);
         } else if (target.discuss_id.has_value()) {
@@ -41,7 +41,7 @@ namespace dice::utils {
         return true;
     }
 
-    bool is_jrrp_enabled(const cq::Target& target) {
+    bool is_jrrp_enabled(const cq::Target &target) {
         if (target.group_id.has_value()) {
             return is_jrrp_enabled(*target.group_id, 0);
         }
@@ -50,7 +50,8 @@ namespace dice::utils {
         }
         return true;
     }
-    void set_help_enabled(const cq::Target& target, const bool enabled) {
+
+    void set_help_enabled(const cq::Target &target, const bool enabled) {
         if (target.group_id.has_value()) {
             set_help_enabled(*target.group_id, 0, enabled);
         } else if (target.discuss_id.has_value()) {
@@ -78,7 +79,7 @@ namespace dice::utils {
         return true;
     }
 
-    bool is_help_enabled(const cq::Target& target) {
+    bool is_help_enabled(const cq::Target &target) {
         if (target.group_id.has_value()) {
             return is_help_enabled(*target.group_id, 0);
         }
@@ -87,6 +88,7 @@ namespace dice::utils {
         }
         return true;
     }
+
     std::string get_date() {
         time_t raw_time;
         time(&raw_time);
@@ -97,7 +99,7 @@ namespace dice::utils {
         return time_format.str();
     }
 
-    void set_jrrp(const cq::Target& target, int jrrp_val) {
+    void set_jrrp(const cq::Target &target, int jrrp_val) {
         SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, jrrp_value, jrrp_date) VALUES (?, ?, ?)");
         st.bind(1, *target.user_id);
         st.bind(2, jrrp_val);
@@ -105,7 +107,7 @@ namespace dice::utils {
         st.exec();
     }
 
-    std::tuple<bool, int> get_jrrp(const cq::Target& target) {
+    std::tuple<bool, int> get_jrrp(const cq::Target &target) {
         SQLite::Statement st(*db::db, "SELECT jrrp_value, jrrp_date FROM qq_info WHERE qq_id = ?");
         st.bind(1, *target.user_id);
         if (st.executeStep()) {
@@ -119,7 +121,7 @@ namespace dice::utils {
         return std::make_tuple(false, 0);
     }
 
-    int get_defaultdice(const cq::Target& target) {
+    int get_defaultdice(const cq::Target &target) {
         SQLite::Statement st(*db::db, "SELECT default_dice FROM qq_info WHERE qq_id = ?");
         st.bind(1, *target.user_id);
         if (st.executeStep()) {
@@ -130,7 +132,7 @@ namespace dice::utils {
 
     std::string get_groupname(const int64_t group_id) {
         auto list = cq::api::get_group_list();
-        for (auto& ele : list) {
+        for (auto &ele : list) {
             if (ele.group_id == group_id) {
                 return ele.group_name;
             }
@@ -138,7 +140,7 @@ namespace dice::utils {
         return msg::GetGlobalMsg("strGroupnameError");
     }
 
-    std::string get_originname(const cq::Target& target) {
+    std::string get_originname(const cq::Target &target) {
         if (target.group_id.has_value()) {
             return "群\"" + get_groupname(*target.group_id) + "\"";
         }
@@ -190,7 +192,7 @@ namespace dice::utils {
     }
 
     // 昵称获取 综合
-    std::string get_nickname(const cq::Target& target) {
+    std::string get_nickname(const cq::Target &target) {
         if (target.user_id.has_value()) {
             if (target.group_id.has_value()) {
                 return get_nickname(*target.group_id, *target.user_id, 0);
@@ -205,7 +207,7 @@ namespace dice::utils {
 
     // 设置群昵称
     void set_group_nickname(const int64_t group_id, const int64_t user_id, const int type,
-                            const std::string& nick_name) {
+                            const std::string &nick_name) {
         SQLite::Statement st(*db::db,
                              "REPLACE INTO group_user_info(group_id, qq_id, type, nick_name) VALUES(?, ?, ?, ?)");
         st.bind(1, group_id);
@@ -216,7 +218,7 @@ namespace dice::utils {
     }
 
     // 设置群昵称
-    void set_group_nickname(const cq::Target& target, const std::string& nick_name) {
+    void set_group_nickname(const cq::Target &target, const std::string &nick_name) {
         if (target.user_id.has_value()) {
             if (target.group_id.has_value()) {
                 set_group_nickname(*target.group_id, *target.user_id, 0, nick_name);
@@ -232,7 +234,7 @@ namespace dice::utils {
     }
 
     // 设置全局昵称
-    void set_global_nickname(const int64_t user_id, const std::string& nick_name) {
+    void set_global_nickname(const int64_t user_id, const std::string &nick_name) {
         SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, nick_name) VALUES(?, ?)");
         st.bind(1, user_id);
         st.bind(2, nick_name);
@@ -240,7 +242,7 @@ namespace dice::utils {
     }
 
     // 设置全局昵称
-    void set_global_nickname(const cq::Target& target, const std::string& nick_name) {
+    void set_global_nickname(const cq::Target &target, const std::string &nick_name) {
         if (target.user_id.has_value()) {
             set_global_nickname(*target.user_id, nick_name);
         } else {
@@ -249,7 +251,7 @@ namespace dice::utils {
     }
 
     // 格式化字符串
-    std::string format_string(const std::string& origin_str, const std::map<std::string, std::string>& format_para) {
+    std::string format_string(const std::string &origin_str, const std::map<std::string, std::string> &format_para) {
         std::string old_str = origin_str;
         bool need_format = true;
         std::map<std::string, std::vector<int>> mp;
@@ -273,7 +275,8 @@ namespace dice::utils {
                     if (dice.empty()) dice = "d";
                     std::string res = std::to_string(dice_calculator(cq::utils::s2ws(dice)).result);
                     res = res.substr(
-                        0, std::max(res.find('.'), std::min(res.find('.') + 3, res.find_last_not_of("0.") + 1)));
+                        0,
+                        std::max(res.find('.'), std::min(res.find('.') + 3, res.find_last_not_of("0.") + 1)));
                     new_str += res;
                 } else if (format_str[0] == '%') {
                     std::string deck_name = format_str.substr(1);
@@ -302,9 +305,7 @@ namespace dice::utils {
                     }
                     new_str +=
                         choose_vec[std::uniform_int_distribution<int>(0, choose_vec.size() - 1)(dice_calculator::ran)];
-                }
-
-                else if (format_str[0] == '@') {
+                } else if (format_str[0] == '@') {
                     int count = 0;
                     std::string deck_name = format_str.substr(1);
                     SQLite::Statement st(*db::db, "SELECT COUNT(*) FROM deck WHERE origin=\"public\" AND name=?");
@@ -329,7 +330,7 @@ namespace dice::utils {
                     }
 
                     SQLite::Statement st1(*db::db,
-                                         "SELECT content FROM deck WHERE origin=\"public\" AND name=? LIMIT 1 OFFSET ?");
+                                          "SELECT content FROM deck WHERE origin=\"public\" AND name=? LIMIT 1 OFFSET ?");
 
                     st1.bind(1, deck_name);
                     st1.bind(2, offset_num);
@@ -355,7 +356,7 @@ namespace dice::utils {
     }
 
     // 获取权限 综合 (非群返回永远为真)
-    bool is_admin_or_owner(const cq::Target& target) {
+    bool is_admin_or_owner(const cq::Target &target) {
         if (target.group_id.has_value() && target.user_id.has_value()) {
             return is_admin_or_owner(*target.group_id, *target.user_id);
         }

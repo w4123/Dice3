@@ -11,11 +11,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool r_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool r_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*r.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void r_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void r_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*r(h)?[ ]*(([0-9]+)#)?([0-9dk+\\-*x×÷/\\(\\)\\^bp\\.]*)[ ]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -46,15 +47,17 @@ namespace dice {
             for (int i = 1; i != RollCount; i++) {
                 res += '\n';
                 res += dice_calculator(dice, default_dice).form_string();
-			}
+            }
 
             if (m[1].first == m[1].second) {
                 cq::api::send_msg(e.target,
                                   utils::format_string(
                                       msg::GetGlobalMsg("strRollDice"),
-                                      std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)},
-                                                                         {"reason", cq::utils::ws2s(reason)},
-                                                                         {"dice_expression", cq::utils::ws2s(res)}}));
+                                      std::map<std::string, std::string>{
+                                          {"nick", utils::get_nickname(e.target)},
+                                          {"reason", cq::utils::ws2s(reason)},
+                                          {"dice_expression", cq::utils::ws2s(res)}
+                                      }));
             } else {
                 cq::api::send_msg(
                     e.target,
@@ -66,7 +69,8 @@ namespace dice {
                                                                    {"origin", utils::get_originname(e.target)},
                                                                    {"nick", utils::get_nickname(e.target)},
                                                                    {"reason", cq::utils::ws2s(reason)},
-                                                                   {"dice_expression", cq::utils::ws2s(res)}}));
+                                                                   {"dice_expression", cq::utils::ws2s(res)}
+                                                               }));
             }
         }
     }

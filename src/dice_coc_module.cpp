@@ -9,11 +9,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool coc_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool coc_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*coc.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void coc_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void coc_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*coc(6|7)?(d)?[ ]*([0-9]*).*",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -37,22 +38,24 @@ namespace dice {
                 std::string CharacterCards;
                 if (UseCOC6) {
                     const std::string strProperty[] = {
-                        "力量", "体质", "体型", "敏捷", "外貌", "智力", "意志", "教育"};
+                        "力量", "体质", "体型", "敏捷", "外貌", "智力", "意志", "教育"
+                    };
                     const std::wstring strRoll[] = {
-                        L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6+3"};
+                        L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6+3"
+                    };
                     const bool AddSpace = GenerateCount != 1;
                     int AllTotal = 0;
                     while (GenerateCount--) {
                         for (int i = 0; i != 8; i++) {
                             CharacterCards += strProperty[i];
                             CharacterCards += ":";
-                            int RollRes = static_cast<int> (dice_calculator(strRoll[i]).result);
+                            int RollRes = static_cast<int>(dice_calculator(strRoll[i]).result);
                             AllTotal += RollRes;
                             CharacterCards += std::to_string(RollRes);
                             CharacterCards += " ";
                             if (AddSpace && RollRes < 10) {
                                 CharacterCards += " ";
-							    }
+                            }
                         }
                         CharacterCards += "共计:";
                         CharacterCards += std::to_string(AllTotal);
@@ -62,23 +65,26 @@ namespace dice {
 
                 } else {
                     const std::string strProperty[] = {
-                        "力量", "体质", "体型", "敏捷", "外貌", "智力", "意志", "教育", "幸运"};
-                    const std::wstring strRoll[] = {L"3D6*5",
-                                                    L"3D6*5",
-                                                    L"(2D6+6)*5",
-                                                    L"3D6*5",
-                                                    L"3D6*5",
-                                                    L"(2D6+6)*5",
-                                                    L"3D6*5",
-                                                    L"(2D6+6)*5",
-                                                    L"(3D6)*5"};
+                        "力量", "体质", "体型", "敏捷", "外貌", "智力", "意志", "教育", "幸运"
+                    };
+                    const std::wstring strRoll[] = {
+                        L"3D6*5",
+                        L"3D6*5",
+                        L"(2D6+6)*5",
+                        L"3D6*5",
+                        L"3D6*5",
+                        L"(2D6+6)*5",
+                        L"3D6*5",
+                        L"(2D6+6)*5",
+                        L"(3D6)*5"
+                    };
                     int AllTotalWithoutLuck = 0;
                     int AllTotal = 0;
                     while (GenerateCount--) {
                         for (int i = 0; i != 9; i++) {
                             CharacterCards += strProperty[i];
                             CharacterCards += ":";
-                            int RollRes = static_cast<int> (dice_calculator(strRoll[i]).result);
+                            int RollRes = static_cast<int>(dice_calculator(strRoll[i]).result);
                             AllTotal += RollRes;
                             if (i != 8) AllTotalWithoutLuck += RollRes;
                             CharacterCards += std::to_string(RollRes);
@@ -96,10 +102,12 @@ namespace dice {
                 cq::api::send_msg(
                     e.target,
                     utils::format_string(msg::GetGlobalMsg("strCharacterCard"),
-                                         std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)},
-                                                                            {"version", UseCOC6 ? "COC6" : "COC7"},
-                                                                            {"character_cards", CharacterCards}}));
-            
+                                         std::map<std::string, std::string>{
+                                             {"nick", utils::get_nickname(e.target)},
+                                             {"version", UseCOC6 ? "COC6" : "COC7"},
+                                             {"character_cards", CharacterCards}
+                                         }));
+
             } else {
                 // TODO: 详细版COC人物生成
                 return;

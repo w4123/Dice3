@@ -10,11 +10,12 @@ namespace cq::event {
 }
 
 namespace dice {
-    bool jrrp_module::match(const cq::event::MessageEvent& e, const std::wstring& ws) {
+    bool jrrp_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*jrrp.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
     }
-    void jrrp_module::process(const cq::event::MessageEvent& e, const std::wstring& ws) {
+
+    void jrrp_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(L"[ ]*[\\.。．][ ]*jrrp[ ]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
@@ -36,8 +37,10 @@ namespace dice {
                 if (std::get<0>(res)) {
                     cq::api::send_msg(e.target,
                                       utils::format_string(msg::GetGlobalMsg("strJrrp"),
-                                                           {{"nick", utils::get_nickname(e.target)},
-                                                            {"jrrp_val", std::to_string(std::get<1>(res))}}));
+                                                           {
+                                                               {"nick", utils::get_nickname(e.target)},
+                                                               {"jrrp_val", std::to_string(std::get<1>(res))}
+                                                           }));
                     return;
                 }
 

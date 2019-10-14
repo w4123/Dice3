@@ -21,7 +21,8 @@
 
 CQ_MAIN {
     // 应用启用时调用，进行模块启用
-    cq::app::on_enable = [] {
+    cq::app::on_enable = []
+    {
         // 连接数据库
         dice::db::db = std::make_unique<SQLite::Database>(
             cq::api::get_app_directory() + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",
@@ -56,8 +57,8 @@ CQ_MAIN {
     };
 
     // 主消息处理函数
-    auto main_func = [](const auto &e) {
-
+    auto main_func = [](const auto &e)
+    {
         bool contain_at = false, at_me = false;
         std::string self_qq_str = std::to_string(cq::api::get_login_user_id());
         for (auto i = e.message.begin(); i != e.message.end(); i++) {
@@ -66,7 +67,7 @@ CQ_MAIN {
                 if (i->data.at("qq") == self_qq_str) {
                     at_me = true;
                     break;
-				}
+                }
             }
         }
         if (contain_at && !at_me) return;
@@ -114,6 +115,7 @@ CQ_MENU(menu_semi_replace_db) {
     dice::db::SemiReplaceDB();
     MessageBoxW(nullptr, L"操作\"半重置数据库\"已完成", L"Dice!", MB_OK | MB_ICONINFORMATION);
 }
+
 CQ_MENU(menu_replace_db) {
     dice::db::ReplaceDB();
     MessageBoxW(nullptr, L"操作\"重置数据库\"已完成", L"Dice!", MB_OK | MB_ICONINFORMATION);

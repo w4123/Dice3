@@ -10,12 +10,14 @@ namespace dice {
 
     std::mt19937 dice_calculator::ran(clock());
 
-    dice_calculator::dice_calculator(std::wstring dice_expression) : dice_expression(std::move(dice_expression)) {
+    dice_calculator::dice_calculator(std::wstring dice_expression)
+        : dice_expression(std::move(dice_expression)) {
         main_calculate();
     }
 
     dice_calculator::dice_calculator(std::wstring dice_expression, int default_dice)
-        : dice_expression(std::move(dice_expression)), default_dice(default_dice) {
+        : dice_expression(std::move(dice_expression)),
+          default_dice(default_dice) {
         main_calculate();
     }
 
@@ -25,18 +27,21 @@ namespace dice {
         }
         return operator_stk.top();
     }
+
     void dice_calculator::operator_stk_pop() {
         if (operator_stk.empty()) {
             throw exception::dice_expression_invalid_error();
         }
         operator_stk.pop();
     }
+
     double dice_calculator::num_stk_top() {
         if (num_stk.empty()) {
             throw exception::dice_expression_invalid_error();
         }
         return num_stk.top();
     }
+
     void dice_calculator::num_stk_pop() {
         if (num_stk.empty()) {
             throw exception::dice_expression_invalid_error();
@@ -88,9 +93,7 @@ namespace dice {
             // 骰子前后有数字属于错误表达式
             if ((i->position() && std::iswdigit(dice_expression[i->position() - 1]))
                 || (i->position() + i->length() != dice_expression.length()
-                    && std::iswdigit(dice_expression[i->position() + i->length()])))
-
-            {
+                    && std::iswdigit(dice_expression[i->position() + i->length()]))) {
                 throw exception::dice_expression_invalid_error();
             }
 
@@ -111,7 +114,7 @@ namespace dice {
             std::wstring dice(match[0]);
 
             // 字母转换为大写
-            for (auto& c : dice) {
+            for (auto &c : dice) {
                 if (c == L'd') c = L'D';
                 if (c == L'k') c = L'K';
                 if (c == L'b') c = L'B';
@@ -153,7 +156,7 @@ namespace dice {
                         std::max((first_res / 10), *std::max_element(bpTempStorage.begin(), bpTempStorage.end())) * 10
                         + (first_res % 10);
                 }
-                for (const auto& c : bpTempStorage) {
+                for (const auto &c : bpTempStorage) {
                     di += std::to_wstring(c);
                     di += L" ";
                 }
@@ -235,6 +238,7 @@ namespace dice {
     }
 
     bool dice_calculator::is_number(wchar_t c) { return std::wstring(L"0123456789").find(c) != std::wstring::npos; }
+
     size_t dice_calculator::get_number_size(size_t current_pos) {
         size_t temp_res = res_display2.find_first_not_of(L"0123456789.", current_pos);
         if (temp_res == std::wstring::npos) {
@@ -257,8 +261,8 @@ namespace dice {
                 }
 
                 if (i < res_display2.size() && res_display2[i] == L'(') {
-                    if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk.top()))
-                        pop_stack_and_calculate();
+                    if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk.top())
+                    ) pop_stack_and_calculate();
                     operator_stk.push(L'*');
                 }
             } else {
@@ -270,8 +274,8 @@ namespace dice {
                     }
                     operator_stk.pop();
                     if (i + 1 < res_display2.size() && res_display2[i + 1] == L'(') {
-                        if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk.top()))
-                            pop_stack_and_calculate();
+                        if (!operator_stk.empty() && priority(L'*') >= priority(operator_stk.top())
+                        ) pop_stack_and_calculate();
                         operator_stk.push(L'*');
                     }
                 } else {
@@ -325,6 +329,7 @@ namespace dice {
         }
         num_stk.push(res);
     }
+
     std::wstring dice_calculator::form_string() {
         std::wstring str = dice_expression;
         if (dice_expression != res_display) {
