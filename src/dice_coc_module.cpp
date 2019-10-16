@@ -38,12 +38,12 @@ namespace dice {
                 }
             }
             if (UseCOC6) {
-                const std::string strProperty[] = {"力量", "体质", "体型", "敏捷", "外貌", "智力", "意志", "教育"};
-                const std::wstring strRoll[] = {L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6+3"};
+                const std::string strProperty[] = {"力量", "体质", "体型", "敏捷", "外貌", "智力", "意志", "教育", "资产"};
+                const std::wstring strRoll[] = {L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6", L"2D6+6", L"3D6", L"3D6+3", L"1D10"};
                 const bool AddSpace = GenerateCount != 1;
                 int AllTotal = 0;
                 while (GenerateCount--) {
-                    for (int i = 0; i != 8; i++) {
+                    for (int i = 0; i != 9; i++) {
                         CharacterCards += strProperty[i];
                         CharacterCards += ":";
                         int RollRes = static_cast<int>(dice_calculator(strRoll[i]).result);
@@ -94,7 +94,7 @@ namespace dice {
                 }
             }
             if (m[2].first != m[2].second) {
-                CharacterCards += "\n{%调查员背景}";
+                CharacterCards += "\n性别: {%性别}\n年龄: {?7d6+8}\n职业: {%调查员职业}\n{%调查员背景}";
             }
             cq::api::send_msg(
                 e.target,
