@@ -275,8 +275,7 @@ namespace dice::utils {
                     if (dice.empty()) dice = "d";
                     std::string res = std::to_string(dice_calculator(cq::utils::s2ws(dice)).result);
                     res = res.substr(
-                        0,
-                        std::max(res.find('.'), std::min(res.find('.') + 3, res.find_last_not_of("0.") + 1)));
+                        0, std::max(res.find('.'), std::min(res.find('.') + 3, res.find_last_not_of("0.") + 1)));
                     new_str += res;
                 } else if (format_str[0] == '%') {
                     std::string deck_name = format_str.substr(1);
@@ -293,6 +292,16 @@ namespace dice::utils {
                     }
                 } else if (format_str[0] == '#') {
                     std::string choose_str = format_str.substr(1);
+                    int count = 1;
+                    std::regex re_count("([^:]*):([0-9]*)");
+                    std::smatch re_count_match;
+                    if (std::regex_match(choose_str, re_count_match, re_count)) {
+                        if (re_count_match[2].first != re_count_match[2].second) count = std::stoi(re_count_match[2]);
+                        choose_str = re_count_match[1];
+                    }
+                    if (count == 0) {
+                        throw exception::exception(msg::GetGlobalMsg("strFormatStrInvalidError"));
+                    }
                     std::regex re("[^|]+");
                     std::vector<std::string> choose_vec;
                     auto word_begin = std::sregex_iterator(choose_str.begin(), choose_str.end(), re);
@@ -303,8 +312,14 @@ namespace dice::utils {
                     if (choose_vec.empty()) {
                         throw exception::exception(msg::GetGlobalMsg("strFormatStrInvalidError"));
                     }
-                    new_str +=
-                        choose_vec[std::uniform_int_distribution<int>(0, choose_vec.size() - 1)(dice_calculator::ran)];
+                    auto choose_vec_copy = choose_vec;
+                    for (int counter = 0; counter != count; counter++) {
+                        int index = std::uniform_int_distribution<int>(0, choose_vec.size() - 1)(dice_calculator::ran);
+                        new_str += choose_vec[index];
+                        choose_vec.erase(choose_vec.begin() + index);
+                        if (counter != count - 1) new_str += " ";
+                        if (choose_vec.empty()) choose_vec = choose_vec_copy;
+                    }
                 } else if (format_str[0] == '@') {
                     int count = 0;
                     std::string deck_name = format_str.substr(1);
@@ -329,8 +344,8 @@ namespace dice::utils {
                         if (offset_num >= ele) offset_num++;
                     }
 
-                    SQLite::Statement st1(*db::db,
-                                          "SELECT content FROM deck WHERE origin=\"public\" AND name=? LIMIT 1 OFFSET ?");
+                    SQLite::Statement st1(
+                        *db::db, "SELECT content FROM deck WHERE origin=\"public\" AND name=? LIMIT 1 OFFSET ?");
 
                     st1.bind(1, deck_name);
                     st1.bind(2, offset_num);

@@ -42,6 +42,7 @@ namespace dice::msg {
         {"strJrrpDisabled", "在本群/讨论组中Jrrp功能已被禁用"},
         {"strFormatStrInvalidError", "错误: 不合法的格式化字符串"},
         {"strDatabaseNotFoundError", "错误: 数据库中未找到此项目"},
+        {"strDrawCountError", "错误: 抽取次数无效"},
         {"strDraw", "{nick}的抽取结果是: {draw_res}"},
         {"strInsane", "{nick}的疯狂发作-{insane_type}症状: {insane_str}"}
     };

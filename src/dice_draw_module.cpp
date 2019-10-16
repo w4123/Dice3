@@ -15,16 +15,28 @@ namespace dice {
     }
 
     void draw_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
-        std::wregex re(L"[ ]*[\\.。．][ ]*draw[ ]*(.*)",
+        std::wregex re(L"[ ]*[\\.。．][ ]*draw[ ]*(.*?)[ ]*([0-9]*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
             if (m[1].first != m[1].second) {
+                int count = 1;
+                if (m[2].first != m[2].second) {
+                    count = std::stoi(m[2]);
+                }
+                if (count == 0 || count > 10) {
+                    throw exception::exception(msg::GetGlobalMsg("strDrawCountError"));
+                }
                 std::string draw_item = cq::utils::ws2s(m[1]);
                 if (draw_item.find('|') != std::string::npos) {
-                    draw_item = "{#" + draw_item + "}";
+                    draw_item = "{#" + draw_item + +":" + std::to_string(count) + "}";
                 } else {
-                    draw_item = "{%" + draw_item + "}";
+                    std::string single_item = "{%" + draw_item + "}";
+                    draw_item = single_item;
+                    for (int i = 1; i != count; i++) {
+                        draw_item += '\n';
+                        draw_item += single_item;
+                    }
                 }
                 cq::api::send_msg(
                     e.target,
