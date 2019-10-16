@@ -2,7 +2,11 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/ft7x1jvdam3xb8jc?svg=true)](https://ci.appveyor.com/project/w4123/dice3)
 
-Dice! V3 是重构后的Dice!新版本(目前仍在编写中, 尚未完成无法使用)
+Dice! V3 是重构后的Dice!新版本
+
+实现了部分功能，剩余功能还在编写当中。具体信息可以参考: https://kokona.tech 开发日志一栏
+
+本应用文档: https://docs.kokona.tech (还没写完)
 
 
 ## 使用方式
