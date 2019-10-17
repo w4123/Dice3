@@ -25,7 +25,7 @@ namespace dice {
                     count = std::stoi(m[2]);
                 }
                 if (count == 0 || count > 10) {
-                    throw exception::exception(msg::GetGlobalMsg("strDrawCountError"));
+                    throw exception::exception(msg::GetGlobalMsg("strCountError"));
                 }
                 std::string draw_item = cq::utils::ws2s(m[1]);
                 if (draw_item.find('|') != std::string::npos) {

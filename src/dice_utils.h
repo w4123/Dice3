@@ -71,7 +71,9 @@ namespace dice::utils {
     void set_global_nickname(const int64_t user_id, const std::string& nick_name);
 
     // 格式化字符串
-    std::string format_string(const std::string& origin_str, const std::map<std::string, std::string>& format_para);
+    std::string format_string(
+        const std::string& origin_str,
+        const std::map<std::string, std::string>& format_para = std::map<std::string, std::string>());
 
 	// 获取权限 群
     bool is_admin_or_owner(const int64_t group_id, const int64_t user_id);

@@ -122,6 +122,24 @@ namespace dice::utils {
     }
 
     int get_defaultdice(const cq::Target &target) {
+        if (target.group_id.has_value()) {
+            SQLite::Statement st(*db::db, "SELECT default_dice FROM group_info WHERE group_id = ? AND type = ?");
+            st.bind(1, *target.group_id);
+            st.bind(2, 0);
+            if (st.executeStep()) {
+                return st.getColumn(0).getInt();
+            }
+            return 100;
+        }
+        if (target.discuss_id.has_value()) {
+            SQLite::Statement st(*db::db, "SELECT default_dice FROM group_info WHERE group_id = ? AND type = ?");
+            st.bind(1, *target.discuss_id);
+            st.bind(2, 1);
+            if (st.executeStep()) {
+                return st.getColumn(0).getInt();
+            }
+            return 100;
+        }
         SQLite::Statement st(*db::db, "SELECT default_dice FROM qq_info WHERE qq_id = ?");
         st.bind(1, *target.user_id);
         if (st.executeStep()) {

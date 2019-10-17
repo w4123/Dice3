@@ -18,6 +18,7 @@
 #include "dice_set_module.h"
 #include "dice_draw_module.h"
 #include "dice_insane_module.h"
+#include "dice_name_module.h"
 
 CQ_MAIN {
     // 应用启用时调用，进行模块启用
@@ -30,29 +31,31 @@ CQ_MAIN {
             3000);
 
         dice::db::InitialiseDB();
+        // 机器人退群
         static dice::dismiss_module DismissModule;
-
+        // 机器人控制
         static dice::bot_module BotModule;
-
+        // 随机抽取
         static dice::draw_module DrawModule;
-
+        // 疯狂抽取
         static dice::insane_module InsaneModule;
-
+        // 随机昵称
+        static dice::name_module NameModule;
+        // 昵称设置
         static dice::nickname_module NicknameModule;
-
+        // 帮助获取
         static dice::help_module HelpModule;
-
+        // 规则获取
         static dice::rules_module RulesModule;
-
+        // 设置默认骰
         static dice::set_module SetModule;
-
+        // 今日人品检定
         static dice::jrrp_module JrrpModule;
-
+        // COC任务生成
         static dice::coc_module CocModule;
-
+        // DND人物生成
         static dice::dnd_module DndModule;
-
-        // 启用普通掷骰模块
+        // 普通掷骰
         static dice::r_module RModule;
     };
 

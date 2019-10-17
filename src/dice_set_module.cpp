@@ -2,9 +2,9 @@
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
+#include "dice_db.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
-#include "dice_db.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -28,18 +28,31 @@ namespace dice {
             if (SetDice <= 0) {
                 throw exception::exception(msg::GetGlobalMsg("strDefaultDiceErr"));
             }
-            SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, default_dice) VAlUES(?, ?)");
-            st.bind(1, *e.target.user_id);
-            st.bind(2, SetDice);
-            st.exec();
+            if (e.message_type == cq::message::PRIVATE) {
+                SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, default_dice) VAlUES(?, ?)");
+                st.bind(1, *e.target.user_id);
+                st.bind(2, SetDice);
+                st.exec();
+            } else {
+                if (!utils::is_admin_or_owner(e.target)) {
+                    throw exception::exception(msg::GetGlobalMsg("strPermissionDeniedError"));
+                }
+                SQLite::Statement st(*db::db, "REPLACE INTO group_info(group_id, type, default_dice) VAlUES(?, ?, ?)");
+                if (e.message_type == cq::message::GROUP) {
+                    st.bind(1, *e.target.group_id);
+                    st.bind(2, 0);
+                } else {
+                    st.bind(1, *e.target.discuss_id);
+                    st.bind(2, 1);
+                }
+                st.bind(3, SetDice);
+                st.exec();
+            }
             cq::api::send_msg(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strDefaultDice"),
-                                     {
-                                         {"nick", utils::get_nickname(e.target)},
-                                         {"dice", "D" + std::to_string(SetDice)}
-                                     }
-                ));
+                                     {{"origin", utils::get_originname(e.target)},
+                                      {"dice", "D" + std::to_string(SetDice)}}));
         }
     }
 } // namespace dice
