@@ -11,7 +11,7 @@ namespace cq::event {
 
 namespace dice {
     bool bot_module::match(const cq::event::MessageEvent &e, const std::wstring &ws) {
-        std::wregex re(L"[ ]*[\\.。．][ ]*bot.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
+        std::wregex re(L"[\\s]*[\\.。．][\\s]*bot.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         if (std::regex_match(ws, re)) return true;
         return search_db(e);
     }
@@ -70,7 +70,7 @@ namespace dice {
     }
 
     void bot_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
-        std::wregex re(L"[ ]*[\\.。．][ ]*bot[ ]*(on|off)?[ ]*(.*)",
+        std::wregex re(L"[\\s]*[\\.。．][\\s]*bot[\\s]*(on|off)?[\\s]*(.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {

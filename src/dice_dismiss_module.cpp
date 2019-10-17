@@ -12,13 +12,13 @@ namespace dice {
         if (e.message_type == cq::message::PRIVATE) {
             return false;
         }
-        std::wregex re(L"[ ]*[\\.。．][ ]*dismiss.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
+        std::wregex re(L"[\\s]*[\\.。．][\\s]*dismiss.*", std::regex_constants::ECMAScript | std::regex_constants::icase);
         return std::regex_match(ws, re);
 
     }
 
     void dismiss_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
-        std::wregex re(L"[ ]*[\\.。．][ ]*dismiss[ ](.*)",
+        std::wregex re(L"[\\s]*[\\.。．][\\s]*dismiss[\\s](.*)",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {

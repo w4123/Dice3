@@ -12,7 +12,7 @@ namespace dice::exception {
     };
 
     struct dice_expression_invalid_error : public exception {
-        dice_expression_invalid_error() : exception(dice::msg::global_msg["strInvalidDiceError"]){};
+        dice_expression_invalid_error() : exception(msg::GetGlobalMsg("strInvalidDiceError")){};
         dice_expression_invalid_error(const char* what) = delete;
         dice_expression_invalid_error(const std::string& what) = delete;
     };

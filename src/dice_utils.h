@@ -1,10 +1,38 @@
 #pragma once
 #include <string>
+#include <set>
 #include "cqsdk/cqsdk.h"
 #include "cqsdk/types.h"
 
 namespace dice::utils {
+    // 获取某人物卡中的某(些)属性
+    std::map<std::string, int> get_card_properties(const cq::Target& target, const std::string& character_card_name,
+                                                   const std::set<std::string>& st_character_properties);
+    // 获取某人物卡中的某(些)属性
+    std::string get_card_properties_string(const cq::Target& target, const std::string& character_card_name,
+                                       const std::set<std::string>& st_character_properties);
+    // 删除某人物卡中的某(些)属性
+    void delete_character_properties(const cq::Target& target, const std::string& character_card_name,
+                                     const std::set<std::string>& st_character_properties);
+    // 删除某人物卡
+    void delete_character_card(const cq::Target& target, const std::string& character_card_name);
 
+    // 获取某人的所有人物卡名称
+    std::set<std::string> get_all_card_name(const cq::Target& target);
+
+    // 获取某人的所有人物卡名称
+    std::string get_all_card_name_string(const cq::Target& target);
+
+    // 获取某个人物卡的全部属性
+    std::map<std::string, int> get_all_card_properties(const cq::Target& target,
+                                                       const std::string& character_card_name);
+
+    // 获取某个人物卡的全部属性
+    std::string get_all_card_properties_string(const cq::Target& target, const std::string& character_card_name);
+    
+    // 设置用户人物卡
+    void set_character_card(const cq::Target& target, const std::string& character_card_name,
+                            const std::map<std::string, int>& mp_character_card);
     // 设置Jrrp开启情况
     void set_jrrp_enabled(const int64_t group_id, const int type, const bool enabled);
 
@@ -49,13 +77,13 @@ namespace dice::utils {
     std::string get_originname(const cq::Target& target);
 
     // 昵称获取 群/讨论组 type=0为群， type=1为讨论组
-    std::string get_nickname(const int64_t group_id, const int64_t user_id, const int type);
+    std::string get_nickname(const int64_t group_id, const int64_t user_id, const int type, const bool only_from_db = false);
 
     // 昵称获取 私聊
-    std::string get_nickname(const int64_t user_id);
+    std::string get_nickname(const int64_t user_id, const bool only_from_db = false);
 
     // 昵称获取 综合
-    std::string get_nickname(const cq::Target& target);
+    std::string get_nickname(const cq::Target& target, const bool only_from_db = false);
 
     // 设置群昵称
     void set_group_nickname(const cq::Target& target, const std::string& nick_name);

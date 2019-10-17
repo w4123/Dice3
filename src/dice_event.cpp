@@ -19,8 +19,10 @@
 #include "dice_draw_module.h"
 #include "dice_insane_module.h"
 #include "dice_name_module.h"
+#include "dice_st_module.h"
 
 CQ_MAIN {
+    cq::config.convert_unicode_emoji = false;
     // 应用启用时调用，进行模块启用
     cq::app::on_enable = []
     {
@@ -43,6 +45,8 @@ CQ_MAIN {
         static dice::name_module NameModule;
         // 昵称设置
         static dice::nickname_module NicknameModule;
+        // 人物卡设置
+        static dice::st_module StModule;
         // 帮助获取
         static dice::help_module HelpModule;
         // 规则获取
@@ -78,7 +82,7 @@ CQ_MAIN {
         // 转换为宽字符串，用于正则匹配
         std::wstring ws = cq::utils::s2ws(e.message.extract_plain_text());
 
-        std::wregex re(L"[ ]*[\\.。．][^]*");
+        std::wregex re(L"[\\s]*[\\.。．][^]*");
 
         if (!std::regex_match(ws, re)) return;
 

@@ -6,13 +6,13 @@
 #include "dice_db.h"
 
 namespace dice::msg {
-    std::string dice_ver = "3.0.0alpha";
-    short dice_build = 1000;
-    std::string dice_info = "Dice! by 溯洄 Version " + dice_ver + "(" + std::to_string(dice_build) + ")";
-    std::string dice_full_info =
+    const std::string dice_ver = "3.0.0alpha";
+    const short dice_build = 1000;
+    const std::string dice_info = "Dice! by 溯洄 Version " + dice_ver + "(" + std::to_string(dice_build) + ")";
+    const std::string dice_full_info =
         dice_info + " [MSVC " + std::to_string(_MSC_FULL_VER) + " " + __DATE__ + " " + __TIME__ + "]";
-    utility::string_t dice_user_agent = utility::conversions::to_string_t("Dice/" + dice_ver);
-    std::map<std::string, std::string> global_msg{
+    const utility::string_t dice_user_agent = utility::conversions::to_string_t("Dice/" + dice_ver);
+    const std::map<std::string, std::string> global_msg{
         {"strRollDice", "{nick} 投掷 {reason}: {dice_expression}"},
         {"strInvalidDiceError", "错误: 不合法的掷骰表达式"},
         {"strNicknameError", "内部错误: 无法获取昵称"},
@@ -45,19 +45,27 @@ namespace dice::msg {
         {"strCountError", "错误: 输入的生成次数过多或无效"},
         {"strNameGenerate", "{nick}的随机名称生成: \n{generate_str}"},
         {"strDraw", "{nick}的抽取结果是: {draw_res}"},
-        {"strInsane", "{nick}的疯狂发作-{insane_type}症状: {insane_str}"}};
+        {"strInsane", "{nick}的疯狂发作-{insane_type}症状: {insane_str}"},
+        {"strStSet", "已成功为人物卡{card_name}设置{num_of_properties}个属性"},
+        {"strStDel", "已成功删除人物卡{card_name}中的{num_of_properties}个属性"},
+        {"strStShow", "人物卡{card_name}的属性如下:\n{card_properties}"},
+        {"strStList", "{nick}的全部可用人物卡如下:\n{card_names}"},
+        {"strStProperty", "{property}: {value}"},
+        {"strStClr", "已成功删除人物卡{card_name}"},
+        {"strStShowEmptyError", "错误: 未输入任何属性, 显示所有属性请输入.st show all"},
+        {"strPropertyNotFoundError", "错误: 无法找到属性{property_name}"}};
 
-    std::map<std::string, std::string> help_msg{
+    const std::map<std::string, std::string> help_msg{
         {"default",
          "Dice! by 溯洄 Version 3 帮助\n输入.bot以获取版本信息\n输入.help "
          "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括多轮 rp rb, "
          "不包括rf 简化) coc dnd "
-         "bot help set(不包括setcoc) jrrp rules dismiss n/nn draw ti/li"},
+         "bot help set(不包括setcoc) jrrp rules dismiss n/nn/nnn name draw ti/li st(暂不能ra/rc)"},
         {"license",
          "Dice! Version 3 使用MIT协议发布, 详细协议及使用的其他开源项目协议请见源代码\n源代码地址: "
          "https://github.com/w4123/Dice3"}};
 
-    std::map<std::string, std::vector<std::string>> default_deck{
+    const std::map<std::string, std::vector<std::string>> default_deck{
         {"name", {"{#{%name@cn}|{%name@en}|{%name@jp}}"}},
         {"name@cn", {"{%中文姓}{%中文名}"}},
         {"name@en", {"{%英语名}·{%英语姓}"}},
@@ -2707,6 +2715,90 @@ namespace dice::msg {
           "{%正逆}\n过去状况: {@塔罗牌} {%正逆}\n未来发展: {@塔罗牌} {%正逆}\n自身现状: {@塔罗牌} "
           "{%正逆}\n周围环境: {@塔罗牌} {%正逆}\n希望恐惧: {@塔罗牌} {%正逆}\n最终结果: {@塔罗牌} {%正逆}"}},
     };
+    const std::map<std::string, std::string> SkillNameReplace = {{"str", "力量"},
+                                                                 {"dex", "敏捷"},
+                                                                 {"pow", "意志"},
+                                                                 {"siz", "体型"},
+                                                                 {"app", "外貌"},
+                                                                 {"luck", "幸运"},
+                                                                 {"luk", "幸运"},
+                                                                 {"lck", "幸运"},
+                                                                 {"con", "体质"},
+                                                                 {"int", "智力/灵感"},
+                                                                 {"智力", "智力/灵感"},
+                                                                 {"灵感", "智力/灵感"},
+                                                                 {"idea", "智力/灵感"},
+                                                                 {"edu", "教育"},
+                                                                 {"mov", "移动力"},
+                                                                 {"san", "理智"},
+                                                                 {"hp", "体力"},
+                                                                 {"mp", "魔法"},
+                                                                 {"侦察", "侦查"},
+                                                                 {"计算机", "计算机使用"},
+                                                                 {"电脑", "计算机使用"},
+                                                                 {"电脑使用", "计算机使用"},
+                                                                 {"信誉", "信用评级"},
+                                                                 {"信誉度", "信用评级"},
+                                                                 {"信用度", "信用评级"},
+                                                                 {"信用", "信用评级"},
+                                                                 {"驾驶", "汽车驾驶"},
+                                                                 {"驾驶汽车", "汽车驾驶"},
+                                                                 {"驾驶(汽车)", "汽车驾驶"},
+                                                                 {"驾驶（汽车）", "汽车驾驶"},
+                                                                 {"驾驶:汽车", "汽车驾驶"},
+                                                                 {"驾驶：汽车", "汽车驾驶"},
+                                                                 {"快速交谈", "话术"},
+                                                                 {"步枪", "步枪/霰弹枪"},
+                                                                 {"霰弹枪", "步枪/霰弹枪"},
+                                                                 {"散弹枪", "步枪/霰弹枪"},
+                                                                 {"步霰", "步枪/霰弹枪"},
+                                                                 {"步/霰", "步枪/霰弹枪"},
+                                                                 {"步散", "步枪/霰弹枪"},
+                                                                 {"步/散", "步枪/霰弹枪"},
+                                                                 {"图书馆", "图书馆使用"},
+                                                                 {"机修", "机械维修"},
+                                                                 {"电器维修", "电气维修"},
+                                                                 {"cm", "克苏鲁神话"},
+                                                                 {"克苏鲁", "克苏鲁神话"},
+                                                                 {"唱歌", "歌唱"},
+                                                                 {"做画", "作画"},
+                                                                 {"耕做", "耕作"},
+                                                                 {"机枪", "机关枪"},
+                                                                 {"导航", "领航"},
+                                                                 {"船", "船驾驶"},
+                                                                 {"驾驶船", "船驾驶"},
+                                                                 {"驾驶(船)", "船驾驶"},
+                                                                 {"驾驶（船）", "船驾驶"},
+                                                                 {"驾驶:船", "船驾驶"},
+                                                                 {"驾驶：船", "船驾驶"},
+                                                                 {"飞行器", "飞行器驾驶"},
+                                                                 {"驾驶飞行器", "飞行器驾驶"},
+                                                                 {"驾驶:飞行器", "飞行器驾驶"},
+                                                                 {"驾驶：飞行器", "飞行器驾驶"},
+                                                                 {"驾驶(飞行器)", "飞行器驾驶"},
+                                                                 {"驾驶（飞行器）", "飞行器驾驶"}};
+
+    const std::map<std::string, int> SkillDefaultVal = {
+        {"会计", 5},        {"人类学", 1}, {"估价", 5},        {"考古学", 1},       {"作画", 5},
+        {"摄影", 5},        {"表演", 5},   {"伪造", 5},        {"文学", 5},         {"书法", 5},
+        {"乐理", 5},        {"厨艺", 5},   {"裁缝", 5},        {"理发", 5},         {"建筑", 5},
+        {"舞蹈", 5},        {"酿酒", 5},   {"捕鱼", 5},        {"歌唱", 5},         {"制陶", 5},
+        {"雕塑", 5},        {"杂技", 5},   {"风水", 5},        {"技术制图", 5},     {"耕作", 5},
+        {"打字", 5},        {"速记", 5},   {"魅惑", 15},       {"攀爬", 20},        {"计算机使用", 5},
+        {"克苏鲁神话", 0},  {"乔装", 5},   {"汽车驾驶", 20},   {"电气维修", 10},    {"电子学", 1},
+        {"话术", 5},        {"鞭子", 5},   {"电锯", 10},       {"斧", 15},          {"剑", 20},
+        {"绞具", 25},       {"链枷", 25},  {"矛", 25},         {"手枪", 20},        {"步枪/霰弹枪", 25},
+        {"冲锋枪", 15},     {"弓术", 15},  {"火焰喷射器", 10}, {"机关枪", 10},      {"重武器", 10},
+        {"急救", 30},       {"历史", 5},   {"恐吓", 15},       {"跳跃", 20},        {"法律", 5},
+        {"图书馆使用", 20}, {"聆听", 20},  {"锁匠", 1},        {"机械维修", 10},    {"医学", 1},
+        {"自然学", 10},     {"领航", 10},  {"神秘学", 5},      {"操作重型机械", 1}, {"说服", 10},
+        {"飞行器驾驶", 1},  {"船驾驶", 1}, {"精神分析", 1},    {"心理学", 10},      {"骑乘", 5},
+        {"地质学", 1},      {"化学", 1},   {"生物学", 1},      {"数学", 1},         {"天文学", 1},
+        {"物理学", 1},      {"药学", 1},   {"植物学", 1},      {"动物学", 1},       {"密码学", 1},
+        {"工程学", 1},      {"气象学", 1}, {"司法科学", 1},    {"妙手", 10},        {"侦查", 25},
+        {"潜行", 20},       {"游泳", 20},  {"投掷", 20},       {"追踪", 10},        {"驯兽", 5},
+        {"潜水", 1},        {"爆破", 1},   {"读唇", 1},        {"催眠", 1},         {"炮术", 1},
+        {"斗殴", 25}};
 
     std::string GetGlobalMsg(const std::string &str) {
         SQLite::Statement st(*db::db, "SELECT val FROM global_msg WHERE title=?");

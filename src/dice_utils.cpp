@@ -1,6 +1,7 @@
 #include "dice_utils.h"
 #include <map>
 #include <regex>
+#include <set>
 #include <string>
 #include <tuple>
 #include "SQLiteCpp/SQLiteCpp.h"
@@ -13,6 +14,141 @@
 #include "random"
 
 namespace dice::utils {
+    std::map<std::string, int> get_card_properties(const cq::Target &target, const std::string &character_card_name,
+                                                   const std::set<std::string> &st_character_properties) {
+        std::map<std::string, int> ret;
+        SQLite::Transaction tran(*db::db);
+        for (const auto &it : st_character_properties) {
+            SQLite::Statement st(
+                *db::db, "SELECT value FROM character_cards WHERE qq_id = ? AND card_name = ? AND property = ?");
+            st.bind(1, *target.user_id);
+            st.bind(2, character_card_name);
+            st.bind(3, it);
+            if (st.executeStep()) {
+                ret[it] = st.getColumn(0).getInt();
+            } else if (msg::SkillDefaultVal.count(it)) {
+                ret[it] = msg::SkillDefaultVal.at(it);
+            } else {
+                throw exception::exception(utils::format_string(msg::GetGlobalMsg("strPropertyNotFoundError"), {{"property_name", it}}));
+            }
+        }
+        return ret;
+    }
+
+    std::string get_card_properties_string(const cq::Target &target, const std::string &character_card_name,
+                                           const std::set<std::string> &st_character_properties) {
+        std::string ret;
+        std::map<std::string, int> card_properties =
+            get_card_properties(target, character_card_name, st_character_properties);
+        std::string fmt = msg::GetGlobalMsg("strStProperty");
+        int count = 1;
+        for (const auto &it : card_properties) {
+            ret += format_string(fmt, {{"property", it.first}, {"value", std::to_string(it.second)}});
+            if (count % 3) {
+                ret += "  ";
+            } else {
+                ret += "\n";
+            }
+            ++count;
+        }
+        ret.erase(ret.end() - 1);
+        return ret;
+    }
+    void delete_character_properties(const cq::Target &target, const std::string &character_card_name,
+                                     const std::set<std::string> &st_character_properties) {
+        SQLite::Transaction tran(*db::db);
+        for (const auto &it : st_character_properties) {
+            SQLite::Statement st(*db::db,
+                                 "DELETE FROM character_cards WHERE qq_id = ? AND card_name = ? AND property = ?");
+            st.bind(1, *target.user_id);
+            st.bind(2, character_card_name);
+            st.bind(3, it);
+            st.exec();
+        }
+        tran.commit();
+    }
+    void delete_character_card(const cq::Target &target, const std::string &character_card_name) {
+        SQLite::Statement st(*db::db, "DELETE FROM character_cards WHERE qq_id = ? AND card_name = ?");
+        st.bind(1, *target.user_id);
+        st.bind(2, character_card_name);
+        st.exec();
+    }
+
+    std::set<std::string> get_all_card_name(const cq::Target &target) {
+        std::set<std::string> ret;
+        SQLite::Transaction tran(*db::db);
+        SQLite::Statement st(*db::db, "SELECT card_name FROM character_cards WHERE qq_id = ?");
+        st.bind(1, *target.user_id);
+        while (st.executeStep()) {
+            if (!ret.count(st.getColumn(0).getString())) {
+                ret.insert(st.getColumn(0).getString());
+            }
+        }
+        tran.commit();
+        if (ret.empty()) {
+            throw exception::exception(msg::GetGlobalMsg("strDatabaseNotFoundError"));
+        }
+        return ret;
+    }
+
+    std::string get_all_card_name_string(const cq::Target &target) {
+        std::set<std::string> card_name = get_all_card_name(target);
+        std::string ret;
+        for (const auto &it : card_name) {
+            ret += it;
+            ret += "\n";
+        }
+        ret.erase(ret.end() - 1);
+        return ret;
+    }
+
+    std::map<std::string, int> get_all_card_properties(const cq::Target &target,
+                                                       const std::string &character_card_name) {
+        std::map<std::string, int> ret;
+        SQLite::Transaction tran(*db::db);
+        SQLite::Statement st(*db::db, "SELECT property, value FROM character_cards WHERE qq_id = ? AND card_name = ?");
+        st.bind(1, *target.user_id);
+        st.bind(2, character_card_name);
+        while (st.executeStep()) {
+            ret[st.getColumn(0).getString()] = st.getColumn(1).getInt();
+        }
+        tran.commit();
+        if (ret.empty()) {
+            throw exception::exception(msg::GetGlobalMsg("strDatabaseNotFoundError"));
+        }
+        return ret;
+    }
+    std::string get_all_card_properties_string(const cq::Target &target, const std::string &character_card_name) {
+        std::string ret;
+        std::map<std::string, int> card_properties = get_all_card_properties(target, character_card_name);
+        std::string fmt = msg::GetGlobalMsg("strStProperty");
+        int count = 1;
+        for (const auto &it : card_properties) {
+            ret += format_string(fmt, {{"property", it.first}, {"value", std::to_string(it.second)}});
+            if (count % 3) {
+                ret += "  ";
+            } else {
+                ret += "\n";
+            }
+            ++count;
+        }
+        ret.erase(ret.end() - 1);
+        return ret;
+    }
+    void set_character_card(const cq::Target &target, const std::string &character_card_name,
+                            const std::map<std::string, int> &mp_character_card) {
+        SQLite::Transaction tran(*db::db);
+        for (const auto &it : mp_character_card) {
+            SQLite::Statement st(*db::db,
+                                 "REPLACE INTO character_cards(qq_id, card_name, property, value) VALUES (?, ?, ?, ?)");
+            st.bind(1, *target.user_id);
+            st.bind(2, character_card_name);
+            st.bind(3, it.first);
+            st.bind(4, it.second);
+            st.exec();
+        }
+        tran.commit();
+    }
     void set_jrrp_enabled(const cq::Target &target, const bool enabled) {
         if (target.group_id.has_value()) {
             set_jrrp_enabled(*target.group_id, 0, enabled);
@@ -169,7 +305,7 @@ namespace dice::utils {
     }
 
     // 昵称获取 群/讨论组 type=0代表群， type=1代表讨论组
-    std::string get_nickname(const int64_t group_id, const int64_t user_id, const int type) {
+    std::string get_nickname(const int64_t group_id, const int64_t user_id, const int type, const bool only_from_db) {
         SQLite::Statement st(*db::db, "SELECT nick_name FROM group_user_info WHERE group_id=? AND qq_id=? AND type=?");
         st.bind(1, group_id);
         st.bind(2, user_id);
@@ -186,7 +322,9 @@ namespace dice::utils {
                 return st1.getColumn(0).getString();
             }
         }
-
+        if (only_from_db) {
+            return "";
+        }
         if (type == 0) {
             const cq::GroupMember gm = cq::api::get_group_member_info(group_id, user_id);
             if (!gm.card.empty()) {
@@ -198,7 +336,7 @@ namespace dice::utils {
     }
 
     // 昵称获取 私聊
-    std::string get_nickname(const int64_t user_id) {
+    std::string get_nickname(const int64_t user_id, const bool only_from_db) {
         SQLite::Statement st(*db::db, "SELECT nick_name FROM qq_info WHERE qq_id=?");
         st.bind(1, user_id);
         if (st.executeStep()) {
@@ -206,19 +344,22 @@ namespace dice::utils {
                 return st.getColumn(0).getString();
             }
         }
+        if (only_from_db) {
+            return "";
+        }
         return cq::api::get_stranger_info(user_id).nickname;
     }
 
     // 昵称获取 综合
-    std::string get_nickname(const cq::Target &target) {
+    std::string get_nickname(const cq::Target &target, const bool only_from_db) {
         if (target.user_id.has_value()) {
             if (target.group_id.has_value()) {
-                return get_nickname(*target.group_id, *target.user_id, 0);
+                return get_nickname(*target.group_id, *target.user_id, 0, only_from_db);
             }
             if (target.discuss_id.has_value()) {
-                return get_nickname(*target.discuss_id, *target.user_id, 1);
+                return get_nickname(*target.discuss_id, *target.user_id, 1, only_from_db);
             }
-            return get_nickname(*target.user_id);
+            return get_nickname(*target.user_id, only_from_db);
         }
         return msg::GetGlobalMsg("strNicknameError");
     }
