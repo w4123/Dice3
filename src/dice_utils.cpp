@@ -14,6 +14,69 @@
 #include "random"
 
 namespace dice::utils {
+    bool if_card_exist(const cq::Target &target, const std::string &card_name) {
+        SQLite::Statement st(*db::db, "SELECT count(*) FROM character_cards WHERE qq_id = ? AND card_name = ?");
+        st.bind(1, *target.user_id);
+        st.bind(2, card_name);
+        if (st.executeStep()) {
+            return st.getColumn(0).getInt() > 0;
+        }
+        return false;
+    }
+    void set_chosen_card(const cq::Target &target, const std::string &card_name) {
+        if (target.group_id.has_value()) {
+            SQLite::Statement st(
+                *db::db, "REPLACE INTO group_user_info(group_id, type, qq_id, card_chosen) VALUES (?, ?, ?, ?)");
+            st.bind(1, *target.group_id);
+            st.bind(2, 0);
+            st.bind(3, *target.user_id);
+            st.bind(4, card_name);
+            st.exec();
+        } else if (target.discuss_id.has_value()) {
+            SQLite::Statement st(
+                *db::db, "REPLACE INTO group_user_info(group_id, type, qq_id, card_chosen) VALUES (?, ?, ?, ?)");
+            st.bind(1, *target.discuss_id);
+            st.bind(2, 1);
+            st.bind(3, *target.user_id);
+            st.bind(4, card_name);
+            st.exec();
+        } else {
+            SQLite::Statement st(*db::db, "REPLACE INTO qq_info(qq_id, card_chosen) VALUES (?, ?)");
+            st.bind(1, *target.user_id);
+            st.bind(2, card_name);
+            st.exec();
+        }
+    }
+    std::string get_chosen_card(const cq::Target &target) {
+        if (target.group_id.has_value()) {
+            SQLite::Statement st(
+                *db::db, "SELECT card_chosen FROM group_user_info WHERE group_id = ? AND type = ? AND qq_id = ?");
+            st.bind(1, *target.group_id);
+            st.bind(2, 0);
+            st.bind(3, *target.user_id);
+            if (st.executeStep()) {
+                return st.getColumn(0).getString();
+            }
+            return "default";
+        }
+        if (target.discuss_id.has_value()) {
+            SQLite::Statement st(
+                *db::db, "SELECT card_chosen FROM group_user_info WHERE group_id = ? AND type = ? AND qq_id = ?");
+            st.bind(1, *target.discuss_id);
+            st.bind(2, 1);
+            st.bind(3, *target.user_id);
+            if (st.executeStep()) {
+                return st.getColumn(0).getString();
+            }
+            return "default";
+        }
+        SQLite::Statement st(*db::db, "SELECT card_chosen FROM qq_info WHERE qq_id = ?");
+        st.bind(1, *target.user_id);
+        if (st.executeStep()) {
+            return st.getColumn(0).getString();
+        }
+        return "default";
+    }
     std::map<std::string, int> get_card_properties(const cq::Target &target, const std::string &character_card_name,
                                                    const std::set<std::string> &st_character_properties) {
         std::map<std::string, int> ret;
@@ -29,7 +92,8 @@ namespace dice::utils {
             } else if (msg::SkillDefaultVal.count(it)) {
                 ret[it] = msg::SkillDefaultVal.at(it);
             } else {
-                throw exception::exception(utils::format_string(msg::GetGlobalMsg("strPropertyNotFoundError"), {{"property_name", it}}));
+                throw exception::exception(
+                    utils::format_string(msg::GetGlobalMsg("strPropertyNotFoundError"), {{"property_name", it}}));
             }
         }
         return ret;

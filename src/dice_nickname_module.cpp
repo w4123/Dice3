@@ -1,9 +1,9 @@
 #include "dice_nickname_module.h"
+#include <cctype>
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
-#include <cctype>
 
 namespace cq::event {
     struct MessageEvent;
@@ -39,18 +39,38 @@ namespace dice {
                 utils::set_group_nickname(e.target, nick_name);
             }
             if (nick_name.empty()) {
-                cq::api::send_msg(e.target,
-                                  utils::format_string(msg::GetGlobalMsg("strNickEmpty"),
-                                                       {{"old_nick", old_nick},
+                cq::api::send_msg(
+                    e.target,
+                    utils::format_string(
+                        msg::GetGlobalMsg("strNickEmpty"),
+                        {{"old_nick", old_nick},
                          {"is_global",
                           (m[1].first == m[1].second || e.message_type == cq::message::PRIVATE) ? "全局" : ""}}));
             } else {
-                cq::api::send_msg(e.target,
-                                  utils::format_string(msg::GetGlobalMsg("strNickSet"),
-                                                       {{"old_nick", old_nick},
-                                                        {"new_nick", nick_name},
-                         {"is_global",
-                          (m[1].first == m[1].second || e.message_type == cq::message::PRIVATE) ? "全局" : ""}}));
+                if ((m[1].first == m[1].second && e.message_type == cq::message::PRIVATE
+                    || m[1].first != m[1].second && e.message_type != cq::message::PRIVATE) &&
+                        utils::if_card_exist(e.target, nick_name)) {
+                    utils::set_chosen_card(e.target, nick_name);
+                    cq::api::send_msg(
+                        e.target,
+                        utils::format_string(
+                            msg::GetGlobalMsg("strNickSetWithCardChange"),
+                            {{"old_nick", old_nick},
+                             {"new_nick", nick_name},
+                             {"is_global",
+                              (m[1].first == m[1].second || e.message_type == cq::message::PRIVATE) ? "全局" : ""}, {"origin", utils::get_originname(e.target)}}));
+
+                } else {
+                    cq::api::send_msg(
+                        e.target,
+                        utils::format_string(
+                            msg::GetGlobalMsg("strNickSet"),
+                            {{"old_nick", old_nick},
+                             {"new_nick", nick_name},
+                             {"is_global",
+                              (m[1].first == m[1].second || e.message_type == cq::message::PRIVATE) ? "全局" : ""}}));
+
+                }
             }
         }
     }

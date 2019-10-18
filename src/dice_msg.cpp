@@ -33,6 +33,7 @@ namespace dice::msg {
         {"strSetNicknameError", "内部错误: 无法设置昵称"},
         {"strCommandNotAvailableError", "错误: 此命令仅可在群/讨论组中使用"},
         {"strNickSet", "已将{old_nick}的{is_global}昵称修改为{new_nick}"},
+        {"strNickSetWithCardChange", "已将{old_nick}的{is_global}昵称修改为{new_nick}, 并将{origin}中的人物卡绑定到\"{new_nick}\""},
         {"strNickEmpty", "已将{old_nick}的{is_global}昵称删除"},
         {"strSetHelpEnabled", "已启用本群/讨论组的Help功能"},
         {"strSetHelpDisabled", "已禁用本群/讨论组的Help功能"},
@@ -46,14 +47,18 @@ namespace dice::msg {
         {"strNameGenerate", "{nick}的随机名称生成: \n{generate_str}"},
         {"strDraw", "{nick}的抽取结果是: {draw_res}"},
         {"strInsane", "{nick}的疯狂发作-{insane_type}症状: {insane_str}"},
-        {"strStSet", "已成功为人物卡{card_name}设置{num_of_properties}个属性"},
-        {"strStDel", "已成功删除人物卡{card_name}中的{num_of_properties}个属性"},
-        {"strStShow", "人物卡{card_name}的属性如下:\n{card_properties}"},
+        {"strStSet", "已成功为人物卡\"{card_name}\"设置{num_of_properties}个属性"},
+        {"strStSetWithChange", "已成功为人物卡\"{card_name}\"设置{num_of_properties}个属性, 其中:\n{change_str}"},
+        {"strStDel", "已成功删除人物卡\"{card_name}\"中的{num_of_properties}个属性"},
+        {"strStShow", "人物卡\"{card_name}\"的属性如下:\n{card_properties}"},
         {"strStList", "{nick}的全部可用人物卡如下:\n{card_names}"},
         {"strStProperty", "{property}: {value}"},
-        {"strStClr", "已成功删除人物卡{card_name}"},
+        {"strStPropertyChange", "{property}{change}: {value_old} -> {value_new}"},
+        {"strStClr", "已成功删除人物卡\"{card_name}\""},
         {"strStShowEmptyError", "错误: 未输入任何属性, 显示所有属性请输入.st show all"},
-        {"strPropertyNotFoundError", "错误: 无法找到属性{property_name}"}};
+        {"strPropertyNotFoundError", "错误: 无法找到属性{property_name}"},
+        {"strPropertyRepeatError", "错误: 输入的属性中含有重复的属性"},
+        {"strStSwitch", "已成功切换到人物卡\"{card_name}\""}};
 
     const std::map<std::string, std::string> help_msg{
         {"default",

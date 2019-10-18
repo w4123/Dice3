@@ -5,6 +5,15 @@
 #include "cqsdk/types.h"
 
 namespace dice::utils {
+    // 查询某人物卡是否存在
+    bool if_card_exist(const cq::Target& target, const std::string& card_name);
+
+    // 设置当前绑定的人物卡
+    void set_chosen_card(const cq::Target& target, const std::string& card_name);
+
+    // 获取当前绑定的人物卡
+    std::string get_chosen_card(const cq::Target& target);
+
     // 获取某人物卡中的某(些)属性
     std::map<std::string, int> get_card_properties(const cq::Target& target, const std::string& character_card_name,
                                                    const std::set<std::string>& st_character_properties);
