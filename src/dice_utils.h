@@ -5,6 +5,25 @@
 #include "cqsdk/types.h"
 
 namespace dice::utils {
+    // 成功等级枚举类
+    enum class success_level : int {
+        Fumble = 0,
+        Failure = 1,
+        Success = 2,
+        HardSuccess = 3,
+        ExtremeSuccess = 4,
+        CriticalSuccess = 5
+    };
+
+    // 获取当前COC判定规则
+    int get_success_rule(const cq::Target& target);
+
+    // 获取判定成功等级
+    success_level get_success_level(const cq::Target& target, const int res, const int rate);
+
+    // 获取判定成功等级字符串
+    std::string get_success_indicator(const cq::Target& target, const int value, const int judge_value);
+
     // 查询某人物卡是否存在
     bool if_card_exist(const cq::Target& target, const std::string& card_name);
 
@@ -13,6 +32,10 @@ namespace dice::utils {
 
     // 获取当前绑定的人物卡
     std::string get_chosen_card(const cq::Target& target);
+
+    // 获取某人物卡中的单个属性
+    int get_single_card_properties(const cq::Target& target, const std::string& character_card_name,
+                                   std::string& property);
 
     // 获取某人物卡中的某(些)属性
     std::map<std::string, int> get_card_properties(const cq::Target& target, const std::string& character_card_name,

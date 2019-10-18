@@ -14,6 +14,108 @@
 #include "random"
 
 namespace dice::utils {
+
+    int get_success_rule(const cq::Target &target) {
+        if (target.group_id.has_value()) {
+            SQLite::Statement st(*db::db, "SELECT success_rule FROM group_info WHERE group_id = ? AND type = ?");
+            st.bind(1, *target.group_id);
+            st.bind(2, 0);
+            if (st.executeStep()) {
+                return st.getColumn(0).getInt();
+            }
+            return 0;
+        }
+        if (target.discuss_id.has_value()) {
+            SQLite::Statement st(*db::db, "SELECT success_rule FROM group_info WHERE group_id = ? AND type = ?");
+            st.bind(1, *target.discuss_id);
+            st.bind(2, 1);
+            if (st.executeStep()) {
+                return st.getColumn(0).getInt();
+            }
+            return 0;
+        }
+        SQLite::Statement st(*db::db, "SELECT success_rule FROM qq_info WHERE qq_id = ?");
+        st.bind(1, *target.user_id);
+        if (st.executeStep()) {
+            return st.getColumn(0).getInt();
+        }
+        return 0;
+    }
+
+    success_level get_success_level(const cq::Target &target, const int res, const int rate) {
+        const int rule = utils::get_success_rule(target);
+        switch (rule) {
+        case 0:
+            if (res == 100) return success_level::Fumble;
+            if (res == 1) return success_level::CriticalSuccess;
+            if (res <= rate / 5) return success_level::ExtremeSuccess;
+            if (res <= rate / 2) return success_level::HardSuccess;
+            if (res <= rate) return success_level::Success;
+            if (rate >= 50 || res < 96) return success_level::Failure;
+            return success_level::Fumble;
+        case 1:
+            if (res == 100) return success_level::Fumble;
+            if (res == 1 || res <= 5 && rate >= 50) return success_level::CriticalSuccess;
+            if (res <= rate / 5) return success_level::ExtremeSuccess;
+            if (res <= rate / 2) return success_level::HardSuccess;
+            if (res <= rate) return success_level::Success;
+            if (rate >= 50 || res < 96) return success_level::Failure;
+            return success_level::Fumble;
+        case 2:
+            if (res == 100) return success_level::Fumble;
+            if (res <= 5 && res <= rate) return success_level::CriticalSuccess;
+            if (res <= rate / 5) return success_level::ExtremeSuccess;
+            if (res <= rate / 2) return success_level::HardSuccess;
+            if (res <= rate) return success_level::Success;
+            if (res < 96) return success_level::Failure;
+            return success_level::Fumble;
+        case 3:
+            if (res >= 96) return success_level::Fumble;
+            if (res <= 5) return success_level::CriticalSuccess;
+            if (res <= rate / 5) return success_level::ExtremeSuccess;
+            if (res <= rate / 2) return success_level::HardSuccess;
+            if (res <= rate) return success_level::Success;
+            return success_level::Failure;
+        case 4:
+            if (res == 100) return success_level::Fumble;
+            if (res <= 5 && res <= rate / 10) return success_level::CriticalSuccess;
+            if (res <= rate / 5) return success_level::ExtremeSuccess;
+            if (res <= rate / 2) return success_level::HardSuccess;
+            if (res <= rate) return success_level::Success;
+            if (rate >= 50 || res < 96 + rate / 10) return success_level::Failure;
+            return success_level::Fumble;
+        case 5:
+            if (res >= 99) return success_level::Fumble;
+            if (res <= 2 && res < rate / 10) return success_level::CriticalSuccess;
+            if (res <= rate / 5) return success_level::ExtremeSuccess;
+            if (res <= rate / 2) return success_level::HardSuccess;
+            if (res <= rate) return success_level::Success;
+            if (rate >= 50 || res < 96) return success_level::Failure;
+            return success_level::Fumble;
+        default:
+            throw exception::exception(msg::GetGlobalMsg("strUnknownError"));
+        }
+    }
+
+    std::string get_success_indicator(const cq::Target &target, const int value, const int judge_value) {
+        const success_level sl = get_success_level(target, value, judge_value);
+        switch (sl) {
+        case success_level::Fumble:
+            return msg::GetGlobalMsg("strFumble");
+        case success_level::Failure:
+            return msg::GetGlobalMsg("strFailure");
+        case success_level::Success:
+            return msg::GetGlobalMsg("strSuccess");
+        case success_level::HardSuccess:
+            return msg::GetGlobalMsg("strHardSuccess");
+        case success_level::ExtremeSuccess:
+            return msg::GetGlobalMsg("strExtremeSuccess");
+        case success_level::CriticalSuccess:
+            return msg::GetGlobalMsg("strCriticalSuccess");
+        }
+        throw exception::exception(msg::GetGlobalMsg("strUnknownError"));
+    }
+
     bool if_card_exist(const cq::Target &target, const std::string &card_name) {
         SQLite::Statement st(*db::db, "SELECT count(*) FROM character_cards WHERE qq_id = ? AND card_name = ?");
         st.bind(1, *target.user_id);
@@ -96,7 +198,24 @@ namespace dice::utils {
                     utils::format_string(msg::GetGlobalMsg("strPropertyNotFoundError"), {{"property_name", it}}));
             }
         }
+        tran.commit();
         return ret;
+    }
+    int get_single_card_properties(const cq::Target &target, const std::string &character_card_name,
+                                   std::string &property) {
+        SQLite::Statement st(*db::db,
+                             "SELECT value FROM character_cards WHERE qq_id = ? AND card_name = ? AND property = ?");
+        st.bind(1, *target.user_id);
+        st.bind(2, character_card_name);
+        st.bind(3, property);
+        if (st.executeStep()) {
+            return st.getColumn(0).getInt();
+        }
+        if (msg::SkillDefaultVal.count(property)) {
+            return msg::SkillDefaultVal.at(property);
+        }
+        throw exception::exception(
+            utils::format_string(msg::GetGlobalMsg("strPropertyNotFoundError"), {{"property_name", property}}));
     }
 
     std::string get_card_properties_string(const cq::Target &target, const std::string &character_card_name,

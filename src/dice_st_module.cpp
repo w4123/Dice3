@@ -16,8 +16,8 @@ namespace dice {
     }
     void st_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(
-            L"[\\s]*[\\.。．][\\s]*st[\\s]*((?:(del[\\s]*(?:(?:(.*?)--)?([^]*)))|(clr[\\s]*(.*)))|(?:(show[\\s]*(?:(?:(."
-            L"*?)--)?([^]*)))|(?:(switch[\\s]*(.*))|((?:(.*?)--)?([^]*)))))",
+            L"[\\s]*[\\.。．][\\s]*st[\\s]*((?:(del[\\s]*(?:(?:(.*?)(?:--|—))?([^]*)))|(clr[\\s]*(.*)))|(?:(show[\\s]*(?:(?:(."
+            L"*?)(?:--|—))?([^]*)))|(?:(switch[\\s]*(.*))|((?:(.*?)(?:--|—))?([^]*)))))",
             std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {

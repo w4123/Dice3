@@ -18,7 +18,7 @@ namespace dice::db {
             "jrrp_value "
             "INTEGER, jrrp_date "
             "TEXT, bot_on INTEGER DEFAULT 1, card_chosen TEXT DEFAULT \"default\", nick_name TEXT, default_dice "
-            "INTEGER NOT NULL DEFAULT 100)");
+            "INTEGER NOT NULL DEFAULT 100, success_rule INTEGER NOT NULL DEFAULT 0 CHECK (success_rule >= 0 AND success_rule <= 5))");
         db->exec(
             "CREATE TABLE IF NOT EXISTS character_cards (qq_id INTEGER NOT NULL, card_name TEXT NOT NULL, property "
             "TEXT NOT NULL, value INTEGER NOT NULL, "
@@ -28,7 +28,7 @@ namespace dice::db {
             "DEFAULT 1, help_on INTEGER DEFAULT 1, jrrp_on INTEGER DEFAULT 1, is_ban INTEGER DEFAULT 0, ban_reason "
             "TEXT, ban_time INTEGER, "
             "is_white "
-            "INTEGER DEFAULT 0, white_time INTEGER, default_dice INTEGER NOT NULL DEFAULT 100,PRIMARY KEY(group_id, type))");
+            "INTEGER DEFAULT 0, white_time INTEGER, default_dice INTEGER NOT NULL DEFAULT 100, success_rule INTEGER NOT NULL DEFAULT 0 CHECK (success_rule >= 0 AND success_rule <= 5), PRIMARY KEY(group_id, type))");
         db->exec(
             "CREATE TABLE IF NOT EXISTS group_user_info (qq_id INTEGER NOT NULL, group_id INTEGER NOT NULL, type "
             "INTEGER "

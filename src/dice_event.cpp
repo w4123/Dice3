@@ -20,6 +20,7 @@
 #include "dice_insane_module.h"
 #include "dice_name_module.h"
 #include "dice_st_module.h"
+#include "dice_rarc_module.h"
 
 CQ_MAIN {
     cq::config.convert_unicode_emoji = false;
@@ -59,6 +60,8 @@ CQ_MAIN {
         static dice::coc_module CocModule;
         // DND人物生成
         static dice::dnd_module DndModule;
+        // 判定掷骰
+        static dice::rarc_module RarcModule;
         // 普通掷骰
         static dice::r_module RModule;
     };
