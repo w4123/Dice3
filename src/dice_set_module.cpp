@@ -5,6 +5,7 @@
 #include "dice_db.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -48,7 +49,7 @@ namespace dice {
                 st.bind(3, SetDice);
                 st.exec();
             }
-            cq::api::send_msg(
+            dice::msg_queue::MsgQueue.add(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strDefaultDice"),
                                      {{"origin", utils::get_originname(e.target)},

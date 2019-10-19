@@ -2,6 +2,7 @@
 #include "cqsdk/cqsdk.h"
 #include "dice_msg.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -29,7 +30,7 @@ namespace dice {
 
                 if (e.message_type == cq::message::GROUP) {
                     if (!utils::is_admin_or_owner(e.target)) {
-                        cq::api::send_msg(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
+                        dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
                         return;
                     }
                     cq::api::set_group_leave(*e.target.group_id, false);

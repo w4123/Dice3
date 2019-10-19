@@ -4,6 +4,7 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -24,18 +25,18 @@ namespace dice {
             std::transform(command.begin(), command.end(), command.begin(), towlower);
             if (command == L"on") {
                 utils::set_jrrp_enabled(e.target, true);
-                cq::api::send_msg(e.target, msg::GetGlobalMsg("strSetJrrpEnabled"));
+                dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strSetJrrpEnabled"));
             } else if (command == L"off") {
                 utils::set_jrrp_enabled(e.target, false);
-                cq::api::send_msg(e.target, msg::GetGlobalMsg("strSetJrrpDisabled"));
+                dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strSetJrrpDisabled"));
             } else {
                 if (!utils::is_jrrp_enabled(e.target)) {
-                    cq::api::send_msg(e.target, msg::GetGlobalMsg("strJrrpDisabled"));
+                    dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strJrrpDisabled"));
                     return;
                 }
                 auto res = utils::get_jrrp(e.target);
                 if (std::get<0>(res)) {
-                    cq::api::send_msg(e.target,
+                    dice::msg_queue::MsgQueue.add(e.target,
                                       utils::format_string(msg::GetGlobalMsg("strJrrp"),
                                                            {
                                                                {"nick", utils::get_nickname(e.target)},
@@ -59,7 +60,7 @@ namespace dice {
                 web::http::http_response response = http_client.request(req).get();
                 // 获取结果
                 auto jrrp_val_str = response.extract_utf8string(true).get();
-                cq::api::send_msg(
+                dice::msg_queue::MsgQueue.add(
                     e.target,
                     utils::format_string(msg::GetGlobalMsg("strJrrp"),
                                          {{"nick", utils::get_nickname(e.target)}, {"jrrp_val", jrrp_val_str}}));

@@ -3,6 +3,7 @@
 #include "cqsdk/cqsdk.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -23,13 +24,13 @@ namespace dice {
             std::transform(origin_query.begin(), origin_query.end(), origin_query.begin(), std::towlower);
             if (origin_query == L"on") {
                 utils::set_help_enabled(e.target, true);
-                cq::api::send_msg(e.target, msg::GetGlobalMsg("strSetHelpEnabled"));
+                dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strSetHelpEnabled"));
             } else if (origin_query == L"off") {
                 utils::set_help_enabled(e.target, false);
-                cq::api::send_msg(e.target, msg::GetGlobalMsg("strSetHelpDisabled"));
+                dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strSetHelpDisabled"));
             } else {
                 if (!utils::is_help_enabled(e.target)) {
-                    cq::api::send_msg(e.target, msg::GetGlobalMsg("strHelpDisabled"));
+                    dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strHelpDisabled"));
                     return;
                 }
                 std::string query;
@@ -38,7 +39,7 @@ namespace dice {
                 } else {
                     query = cq::utils::ws2s(origin_query);
                 }
-                cq::api::send_msg(e.target, msg::GetHelpMsg(query));
+                dice::msg_queue::MsgQueue.add(e.target, msg::GetHelpMsg(query));
             }
         }
     }

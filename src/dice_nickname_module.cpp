@@ -4,6 +4,7 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -39,7 +40,7 @@ namespace dice {
                 utils::set_group_nickname(e.target, nick_name);
             }
             if (nick_name.empty()) {
-                cq::api::send_msg(
+                dice::msg_queue::MsgQueue.add(
                     e.target,
                     utils::format_string(
                         msg::GetGlobalMsg("strNickEmpty"),
@@ -51,7 +52,7 @@ namespace dice {
                     || m[1].first != m[1].second && e.message_type != cq::message::PRIVATE) &&
                         utils::if_card_exist(e.target, nick_name)) {
                     utils::set_chosen_card(e.target, nick_name);
-                    cq::api::send_msg(
+                    dice::msg_queue::MsgQueue.add(
                         e.target,
                         utils::format_string(
                             msg::GetGlobalMsg("strNickSetWithCardChange"),
@@ -61,7 +62,7 @@ namespace dice {
                               (m[1].first == m[1].second || e.message_type == cq::message::PRIVATE) ? "全局" : ""}, {"origin", utils::get_originname(e.target)}}));
 
                 } else {
-                    cq::api::send_msg(
+                    dice::msg_queue::MsgQueue.add(
                         e.target,
                         utils::format_string(
                             msg::GetGlobalMsg("strNickSet"),

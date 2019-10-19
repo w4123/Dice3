@@ -2,6 +2,7 @@
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -19,7 +20,7 @@ namespace dice {
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
             if (m[1].first != m[1].second) {
-                cq::api::send_msg(e.target,
+                dice::msg_queue::MsgQueue.add(e.target,
                                   utils::format_string(cq::utils::ws2s(m[1]),
                                                        {{"nick", utils::get_nickname(e.target)}}));
             }

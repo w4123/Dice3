@@ -3,6 +3,7 @@
 #include "dice_exception.h"
 #include "dice_insane_module.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -26,7 +27,7 @@ namespace dice {
             } else {
                 insane_str = "{%总结症状}";
             }
-            cq::api::send_msg(
+            dice::msg_queue::MsgQueue.add(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strInsane"),
                                      {

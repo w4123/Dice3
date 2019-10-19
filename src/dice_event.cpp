@@ -21,6 +21,7 @@
 #include "dice_name_module.h"
 #include "dice_st_module.h"
 #include "dice_rarc_module.h"
+#include "dice_msg_queue.h"
 
 CQ_MAIN {
     cq::config.convert_unicode_emoji = false;
@@ -34,6 +35,8 @@ CQ_MAIN {
             3000);
 
         dice::db::InitialiseDB();
+        // 启动异步消息发送队列
+        dice::msg_queue::MsgQueue.start();
         // 机器人退群
         static dice::dismiss_module DismissModule;
         // 机器人控制
@@ -107,7 +110,7 @@ CQ_MAIN {
                 cq::logging::debug("Dice! V3", ex.what());
             } catch (const std::exception &ex) {
                 cq::logging::debug("Dice! V3", ex.what());
-                cq::api::send_msg(e.target, ex.what());
+                dice::msg_queue::MsgQueue.add(e.target, ex.what());
             }
         }
     };
@@ -117,8 +120,19 @@ CQ_MAIN {
     cq::event::on_group_msg = main_func;
     cq::event::on_discuss_msg = main_func;
 
-    cq::app::on_disable = [] { dice::db::db = nullptr; };
-    cq::app::on_coolq_exit = [] { dice::db::db = nullptr; };
+    cq::app::on_disable = []
+    {
+        // 断开与数据库的连接
+        dice::db::db = nullptr;
+        //停止异步消息发送队列
+        dice::msg_queue::MsgQueue.stop();
+    };
+    cq::app::on_coolq_exit = [] { 
+        // 断开与数据库的连接
+        dice::db::db = nullptr;
+        //停止异步消息发送队列
+        dice::msg_queue::MsgQueue.stop();
+    };
 }
 
 CQ_MENU(menu_semi_replace_db) {

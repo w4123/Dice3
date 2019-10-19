@@ -3,6 +3,7 @@
 #include "dice_exception.h"
 #include "dice_name_module.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 #include <cctype>
 
 namespace cq::event {
@@ -40,7 +41,7 @@ namespace dice {
                 str += " ";
                 str += generate_str;
             }
-            cq::api::send_msg(e.target,
+            dice::msg_queue::MsgQueue.add(e.target,
                               utils::format_string(msg::GetGlobalMsg("strNameGenerate"),
                                                    {{"nick", utils::get_nickname(e.target)}, {"generate_str", str}}));
         }

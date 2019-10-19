@@ -4,6 +4,7 @@
 #include "dice_db.h"
 #include "dice_msg.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -81,20 +82,20 @@ namespace dice {
                 || target == cq::utils::s2ws(cq::api::get_login_nickname())) {
                 if (command == L"on") {
                     if (e.message_type == cq::message::GROUP && !utils::is_admin_or_owner(e.target)) {
-                        cq::api::send_msg(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
+                        dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
                         return;
                     }
                     update_db(e, true);
-                    cq::api::send_msg(e.target, msg::GetGlobalMsg("strEnabled"));
+                    dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strEnabled"));
                 } else if (command == L"off") {
                     if (e.message_type == cq::message::GROUP && !utils::is_admin_or_owner(e.target)) {
-                        cq::api::send_msg(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
+                        dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strPermissionDeniedError"));
                         return;
                     }
                     update_db(e, false);
-                    cq::api::send_msg(e.target, msg::GetGlobalMsg("strDisabled"));
+                    dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strDisabled"));
                 } else {
-                    cq::api::send_msg(e.target, msg::dice_full_info);
+                    dice::msg_queue::MsgQueue.add(e.target, msg::dice_full_info);
                 }
             }
         }

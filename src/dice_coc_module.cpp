@@ -3,6 +3,7 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -96,7 +97,7 @@ namespace dice {
             if (m[2].first != m[2].second) {
                 CharacterCards += "\n性别: {%性别}\n年龄: {?7d6+8}\n职业: {%调查员职业}\n{%调查员背景}";
             }
-            cq::api::send_msg(
+            dice::msg_queue::MsgQueue.add(
                 e.target,
                 utils::format_string(msg::GetGlobalMsg("strCharacterCard"),
                                      std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)},

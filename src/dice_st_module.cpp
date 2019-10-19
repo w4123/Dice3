@@ -3,6 +3,7 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -23,7 +24,7 @@ namespace dice {
         if (std::regex_match(ws, m, re)) {
             // 获取全部人物卡
             if (m[1].first == m[1].second) {
-                cq::api::send_msg(e.target,
+                dice::msg_queue::MsgQueue.add(e.target,
                                   utils::format_string(msg::GetGlobalMsg("strStList"),
                                                        {{"nick", utils::get_nickname(e.target)},
                                                         {"card_names", utils::get_all_card_name_string(e.target)}}));
@@ -55,7 +56,7 @@ namespace dice {
                     }
                 }
                 utils::delete_character_properties(e.target, character_card_name, st_properties);
-                cq::api::send_msg(e.target,
+                dice::msg_queue::MsgQueue.add(e.target,
                                   utils::format_string(msg::GetGlobalMsg("strStDel"),
                                                        {{"card_name", character_card_name},
                                                         {"num_of_properties", std::to_string(st_properties.size())}}));
@@ -68,7 +69,7 @@ namespace dice {
                     character_card_name = utils::get_chosen_card(e.target);
                 }
                 utils::delete_character_card(e.target, character_card_name);
-                cq::api::send_msg(
+                dice::msg_queue::MsgQueue.add(
                     e.target,
                     utils::format_string(msg::GetGlobalMsg("strStClr"), {{"card_name", character_card_name}}));
                 return;
@@ -84,7 +85,7 @@ namespace dice {
                     return std::tolower(c);
                 });
                 if (properties == "all") {
-                    cq::api::send_msg(
+                    dice::msg_queue::MsgQueue.add(
                         e.target,
                         utils::format_string(msg::GetGlobalMsg("strStShow"),
                                              {{"card_name", character_card_name},
@@ -108,7 +109,7 @@ namespace dice {
                     if (st_properties.empty()) {
                         throw exception::exception(msg::GetGlobalMsg("strStShowEmptyError"));
                     }
-                    cq::api::send_msg(
+                    dice::msg_queue::MsgQueue.add(
                         e.target,
                         utils::format_string(
                             msg::GetGlobalMsg("strStShow"),
@@ -125,7 +126,7 @@ namespace dice {
                     character_card_name = "default";
                 }
                 utils::set_chosen_card(e.target, character_card_name);
-                cq::api::send_msg(
+                dice::msg_queue::MsgQueue.add(
                     e.target,
                     utils::format_string(msg::GetGlobalMsg("strStSwitch"), {{"card_name", character_card_name}}));
                 return;
@@ -201,14 +202,14 @@ namespace dice {
                 }
                 utils::set_character_card(e.target, character_card_name, mp_character_card);
                 if (st_character_card_change.empty()) {
-                    cq::api::send_msg(
+                    dice::msg_queue::MsgQueue.add(
                         e.target,
                         utils::format_string(msg::GetGlobalMsg("strStSet"),
                                              {{"card_name", character_card_name},
                                               {"num_of_properties", std::to_string(mp_character_card.size())}}));
                 } else {
                     change_str.erase(change_str.end() - 1);
-                    cq::api::send_msg(
+                    dice::msg_queue::MsgQueue.add(
                         e.target,
                         utils::format_string(msg::GetGlobalMsg("strStSetWithChange"),
                                              {{"card_name", character_card_name},

@@ -5,6 +5,7 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_utils.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -56,7 +57,7 @@ namespace dice {
             res = cal.form_string();
 
             if (m[2].first == m[2].second) {
-                cq::api::send_msg(
+                dice::msg_queue::MsgQueue.add(
                     e.target,
                     utils::format_string(
                         msg::GetGlobalMsg("strRollDiceWithJudge"),
@@ -67,12 +68,12 @@ namespace dice {
                             {"judge_value", std::to_string(judge_value)},
                             {"success_indicator", utils::get_success_indicator(e.target, static_cast<int>(cal.result), judge_value)}}));
             } else {
-                cq::api::send_msg(
+                dice::msg_queue::MsgQueue.add(
                     e.target,
                     utils::format_string(msg::GetGlobalMsg("strHiddenDice"),
                                          std::map<std::string, std::string>{{"nick", utils::get_nickname(e.target)}}));
-                cq::api::send_private_msg(
-                    *e.target.user_id,
+                dice::msg_queue::MsgQueue.add(
+                    cq::Target(*e.target.user_id),
                     utils::format_string(
                         msg::GetGlobalMsg("strRollHiddenDiceWithJudge"),
                         std::map<std::string, std::string>{

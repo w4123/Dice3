@@ -3,6 +3,7 @@
 #include "dice_calculator.h"
 #include "dice_exception.h"
 #include "dice_rules_module.h"
+#include "dice_msg_queue.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -50,9 +51,9 @@ namespace dice {
 
             std::string res = response.extract_utf8string().get();
             if (res.empty()) {
-                cq::api::send_msg(e.target, msg::GetGlobalMsg("strRulesNotFoundError"));
+                dice::msg_queue::MsgQueue.add(e.target, msg::GetGlobalMsg("strRulesNotFoundError"));
             } else {
-                cq::api::send_msg(e.target, res);
+                dice::msg_queue::MsgQueue.add(e.target, res);
             }
         }
     }
