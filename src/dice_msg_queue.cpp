@@ -15,7 +15,11 @@ namespace dice::msg_queue {
                     }
                 }
                 if (!msg.second.empty()) {
-                    cq::api::send_msg(msg.first, msg.second);
+                    try {
+                        cq::api::send_msg(msg.first, msg.second);
+                    } catch (const std::exception& e) {
+                        cq::logging::debug("Dice!",e.what());
+                    }
                 } else {
                     std::this_thread::sleep_for(std::chrono::milliseconds(20));
                 }
@@ -24,8 +28,7 @@ namespace dice::msg_queue {
         });
         _msg_send_thread.detach();
     }
-    void msg_queue::stop()
-    {
+    void msg_queue::stop() {
         _activated = false;
         while (_thread_running) std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
