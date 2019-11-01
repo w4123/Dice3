@@ -1,6 +1,7 @@
 # Dice V3
 
 [![Build status](https://ci.appveyor.com/api/projects/status/ft7x1jvdam3xb8jc?svg=true)](https://ci.appveyor.com/project/w4123/dice3)
+[![CodeFactor](https://www.codefactor.io/repository/github/w4123/dice3/badge/master)](https://www.codefactor.io/repository/github/w4123/dice3/overview/master)
 
 Dice! V3 是重构后的Dice!新版本
 
