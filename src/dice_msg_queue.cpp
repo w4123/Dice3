@@ -3,6 +3,8 @@
 
 namespace dice::msg_queue {
     void msg_queue::start() {
+        if (_activated) return;
+        _activated = true;
         _msg_send_thread = std::thread([&] {
             _thread_running = true;
             while (_activated) {
@@ -29,6 +31,7 @@ namespace dice::msg_queue {
         _msg_send_thread.detach();
     }
     void msg_queue::stop() {
+        if (!_activated) return;
         _activated = false;
         while (_thread_running) std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }

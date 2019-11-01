@@ -8,7 +8,7 @@ namespace dice::msg_queue {
 
     class msg_queue {
     public:
-        std::atomic<bool> _activated = true;
+        std::atomic<bool> _activated = false;
         std::atomic<bool> _thread_running = false;
         std::mutex _mutex_send_thread;
         std::thread _msg_send_thread;

@@ -17,7 +17,7 @@ namespace dice {
     }
 
     void name_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
-        std::wregex re(L"[\\s]*[\\.。．][\\s]*name[\\s]*([a-z]*)[\\s]([0-9]*).*",
+        std::wregex re(L"[\\s]*[\\.。．][\\s]*name[\\s]*([a-z]*)[\\s]*([0-9]*).*",
                        std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
 
