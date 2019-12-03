@@ -6,8 +6,8 @@
 #include "dice_db.h"
 
 namespace dice::msg {
-    const std::string dice_ver = "3.0.0alpha";
-    const short dice_build = 1000;
+    const std::string dice_ver = "3.0.0alpha w20191203";
+    const short dice_build = 1001;
     const std::string dice_info = "Dice! by 溯洄 Version " + dice_ver + "(" + std::to_string(dice_build) + ")";
     const std::string dice_full_info =
         dice_info + " [MSVC " + std::to_string(_MSC_FULL_VER) + " " + __DATE__ + " " + __TIME__ + "]";
@@ -24,7 +24,10 @@ namespace dice::msg {
             {"strPermissionDeniedError", "错误: 此操作需要群主或管理员权限"}, {"strEnabled", "机器人已启用"},
             {"strDisabled", "机器人已停用"}, {"strGenerateCountError", "错误: 人物生成个数超出限制(1-10)"},
             {"strCharacterCard", "{nick}的{version}版人物作成:\n{character_cards}"},
-            {"strDefaultDiceErr", "错误: 默认骰无效"}, {"strDefaultDice", "已将{origin}的默认骰设置为{dice}"},
+            {"strDefaultDiceErr", "错误: 默认骰无效"}, 
+			{"strDefaultDice", "已将{origin}的默认骰设置为{dice}"},
+			{"strSuccessRule", "已将{origin}的成功判定规则设置为规则{rule}"},
+			{"strSuccessRuleErr", "错误: 成功判定规则无效"},
             {"strHelpNotFoundError", "未找到对应的帮助信息"}, {"strRulesNotFoundError", "未找到对应的规则信息"},
             {"strParaEmptyError", "错误: 关键参数为空, 请查看对应命令的帮助信息"},
             {"strJrrp", "{nick}今天的人品值是: {jrrp_val}"}, {"strSetNicknameError", "内部错误: 无法设置昵称"},

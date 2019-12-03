@@ -22,6 +22,7 @@
 #include "dice_st_module.h"
 #include "dice_rarc_module.h"
 #include "dice_msg_queue.h"
+#include "dice_setcoc_module.h"
 
 CQ_MAIN {
     cq::config.convert_unicode_emoji = false;
@@ -55,6 +56,8 @@ CQ_MAIN {
         static dice::help_module HelpModule;
         // 规则获取
         static dice::rules_module RulesModule;
+		// 设置判定规则
+        static dice::setcoc_module SetCocModule;
         // 设置默认骰
         static dice::set_module SetModule;
         // 今日人品检定

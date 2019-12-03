@@ -32,7 +32,7 @@ git submodule update
 ### 准备构建环境
 
 ```ps1
-powershell .\scripts\prepare.ps1
+powershell -ExecutionPolicy Bypass .\scripts\prepare.ps1
 ```
 
 [`scripts/prepare.ps1`](scripts/prepare.ps1) 脚本会在当前项目目录的 `vcpkg` 子目录中安装 vcpkg，并安装所需依赖。
@@ -42,8 +42,8 @@ powershell .\scripts\prepare.ps1
 ### 构建项目
 
 ```ps1
-powershell .\scripts\generate.ps1 Debug
-powershell .\scripts\build.ps1 Debug
+powershell -ExecutionPolicy Bypass .\scripts\generate.ps1 Debug
+powershell -ExecutionPolicy Bypass .\scripts\build.ps1 Debug
 ```
 
 上面两条命令分别生成 build 目录和构建项目，将 `Debug` 改为 `Release` 可以构建 release 版本。如果安装了 CMake 还没支持的较新版本 VS，需要先手动进入 VS 2017 或 2019 的 Developer Command Prompt，再执行上面的命令。

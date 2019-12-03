@@ -2,8 +2,8 @@
     "ret": 1,
     "apiver": 9,
     "name": "Dice!",
-    "version": "3.0.0",
-    "version_id": 1000,
+    "version": "3.0.0alpha w20191203",
+    "version_id": 1001,
     "author": "w4123溯洄",
     "description": "跑团用掷骰机器人",
     "event": [
@@ -139,7 +139,7 @@
         // 150, // setFriendAddRequest
         // 151, // setGroupAddRequest
         160, // getGroupMemberList
-        161, // getGroupList
+        161 // getGroupList
         // 180 // deleteMsg
     ]
 }
