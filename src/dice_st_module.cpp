@@ -2,8 +2,8 @@
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
 #include "dice_exception.h"
-#include "dice_utils.h"
 #include "dice_msg_queue.h"
+#include "dice_utils.h"
 
 namespace cq::event {
     struct MessageEvent;
@@ -17,17 +17,19 @@ namespace dice {
     }
     void st_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(
-            L"[\\s]*[\\.。．][\\s]*st[\\s]*((?:(del[\\s]*(?:(?:(.*?)(?:--|—))?([^]*)))|(clr[\\s]*(.*)))|(?:(show[\\s]*(?:(?:(."
+            L"[\\s]*[\\.。．][\\s]*st[\\s]*((?:(del[\\s]*(?:(?:(.*?)(?:--|—))?([^]*)))|(clr[\\s]*(.*)))|(?:(show[\\s]*("
+            L"?:(?:(."
             L"*?)(?:--|—))?([^]*)))|(?:(switch[\\s]*(.*))|((?:(.*?)(?:--|—))?([^]*)))))",
             std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
             // 获取全部人物卡
             if (m[1].first == m[1].second) {
-                dice::msg_queue::MsgQueue.add(e.target,
-                                  utils::format_string(msg::GetGlobalMsg("strStList"),
-                                                       {{"nick", utils::get_nickname(e.target)},
-                                                        {"card_names", utils::get_all_card_name_string(e.target)}}));
+                dice::msg_queue::MsgQueue.add(
+                    e.target,
+                    utils::format_string(msg::GetGlobalMsg("strStList"),
+                                         {{"nick", utils::get_nickname(e.target)},
+                                          {"card_names", utils::get_all_card_name_string(e.target)}}));
                 return;
             }
             // 删除属性
@@ -38,28 +40,35 @@ namespace dice {
                 }
 
                 std::string properties(cq::utils::ws2s(m[4]));
-                std::set<std::string> st_properties;
-                std::regex property_re("([^\\s\\|0-9]+)");
-                auto word_begin = std::sregex_iterator(properties.begin(), properties.end(), property_re);
-                auto word_end = std::sregex_iterator();
-                for (auto word_it = word_begin; word_it != word_end; word_it++) {
-                    std::string property_name = (*word_it)[1];
-                    std::transform(
-                        property_name.begin(), property_name.end(), property_name.begin(), [](unsigned char c) {
-                            return std::tolower(c);
-                        });
-                    if (msg::SkillNameReplace.count(property_name)) {
-                        property_name = msg::SkillNameReplace.at(property_name);
+                std::transform(properties.begin(), properties.end(), properties.begin(), [](unsigned char c) {
+                    return std::tolower(c);
+                });
+                if (properties == "all") {
+                    utils::delete_character_card(e.target, character_card_name);
+                    dice::msg_queue::MsgQueue.add(
+                        e.target,
+                        utils::format_string(msg::GetGlobalMsg("strStClr"), {{"card_name", character_card_name}}));
+                } else {
+                    std::set<std::string> st_properties;
+                    std::regex property_re("([^\\s\\|0-9]+)");
+                    auto word_begin = std::sregex_iterator(properties.begin(), properties.end(), property_re);
+                    auto word_end = std::sregex_iterator();
+                    for (auto word_it = word_begin; word_it != word_end; word_it++) {
+                        std::string property_name = (*word_it)[1];
+                        if (msg::SkillNameReplace.count(property_name)) {
+                            property_name = msg::SkillNameReplace.at(property_name);
+                        }
+                        if (!st_properties.count(property_name)) {
+                            st_properties.insert(property_name);
+                        }
                     }
-                    if (!st_properties.count(property_name)) {
-                        st_properties.insert(property_name);
-                    }
-                }
-                utils::delete_character_properties(e.target, character_card_name, st_properties);
-                dice::msg_queue::MsgQueue.add(e.target,
-                                  utils::format_string(msg::GetGlobalMsg("strStDel"),
-                                                       {{"card_name", character_card_name},
-                                                        {"num_of_properties", std::to_string(st_properties.size())}}));
+                    utils::delete_character_properties(e.target, character_card_name, st_properties);
+                    dice::msg_queue::MsgQueue.add(
+                        e.target,
+                        utils::format_string(msg::GetGlobalMsg("strStDel"),
+                                             {{"card_name", character_card_name},
+                                              {"num_of_properties", std::to_string(st_properties.size())}}));
+				}
                 return;
             }
             // 删除人物卡
@@ -146,7 +155,8 @@ namespace dice {
                 std::map<std::string, int> mp_character_card;
                 std::map<std::string, std::string> mp_character_card_change;
                 std::set<std::string> st_character_card_change;
-                std::regex card_re("([^\\s\\|0-9\\+\\-]+?)[:=\\s]?([0-9]+)|([^\\s\\|0-9]+?)([\\+\\-][0-9d\\+\\-\\(\\)]+)");
+                std::regex card_re(
+                    "([^\\s\\|0-9\\+\\-]+?)[:=\\s]?([0-9]+)|([^\\s\\|0-9]+?)([\\+\\-][0-9d\\+\\-\\(\\)]+)");
                 auto word_begin = std::sregex_iterator(character_card.begin(), character_card.end(), card_re);
                 auto word_end = std::sregex_iterator();
                 for (auto word_it = word_begin; word_it != word_end; word_it++) {
@@ -189,14 +199,14 @@ namespace dice {
                         std::string dice = it_change.second;
                         if (!dice.empty() && dice[0] == '+') dice = dice.substr(1);
                         dice_calculator cal(cq::utils::s2ws(dice), utils::get_defaultdice(e.target));
-                        int new_value = old_value[it_change.first] + static_cast<int> (cal.result);
+                        int new_value = old_value[it_change.first] + static_cast<int>(cal.result);
                         mp_character_card[it_change.first] = new_value;
-                        change_str +=
-                            utils::format_string(msg::GetGlobalMsg("strStPropertyChange"),
-                                                 {{"property", it_change.first},
+                        change_str += utils::format_string(
+                            msg::GetGlobalMsg("strStPropertyChange"),
+                            {{"property", it_change.first},
                              {"change", it_change.second + "=" + std::to_string(static_cast<int>(cal.result))},
-                                                  {"value_old", std::to_string(old_value[it_change.first])},
-                                                  {"value_new", std::to_string(new_value)}});
+                             {"value_old", std::to_string(old_value[it_change.first])},
+                             {"value_new", std::to_string(new_value)}});
                         change_str += "\n";
                     }
                 }
@@ -214,7 +224,7 @@ namespace dice {
                         utils::format_string(msg::GetGlobalMsg("strStSetWithChange"),
                                              {{"card_name", character_card_name},
                                               {"num_of_properties", std::to_string(mp_character_card.size())},
-                                              {"change_str", change_str}}));      
+                                              {"change_str", change_str}}));
                 }
             }
         }

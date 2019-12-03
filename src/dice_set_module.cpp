@@ -38,7 +38,7 @@ namespace dice {
                 if (!utils::is_admin_or_owner(e.target)) {
                     throw exception::exception(msg::GetGlobalMsg("strPermissionDeniedError"));
                 }
-                SQLite::Statement st(*db::db, "REPLACE INTO group_info(group_id, type, default_dice) VAlUES(?, ?, ?)");
+                SQLite::Statement st(*db::db, "REPLACE INTO group_info(group_id, type, default_dice) VALUES(?, ?, ?)");
                 if (e.message_type == cq::message::GROUP) {
                     st.bind(1, *e.target.group_id);
                     st.bind(2, 0);
