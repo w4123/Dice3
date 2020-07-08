@@ -4,6 +4,8 @@
 #include <set>
 #include <string>
 #include <tuple>
+#include <iomanip>
+#include <random>
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "cqsdk/cqsdk.h"
 #include "cqsdk/types.h"
@@ -11,7 +13,7 @@
 #include "dice_db.h"
 #include "dice_exception.h"
 #include "dice_msg.h"
-#include "random"
+
 
 namespace dice::utils {
 

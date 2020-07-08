@@ -1,3 +1,5 @@
+#include <regex>
+#include <cwctype>
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"
 #include "dice_exception.h"

@@ -2,6 +2,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <random>
 
 namespace dice {
     class dice_calculator {

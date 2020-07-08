@@ -1,3 +1,5 @@
+#include <regex>
+#include <cwctype>
 #include "cpprest/http_client.h"
 #include "cqsdk/cqsdk.h"
 #include "dice_calculator.h"

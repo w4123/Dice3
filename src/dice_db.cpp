@@ -1,5 +1,6 @@
 #include "dice_db.h"
 #include <memory>
+#include <filesystem>
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "cqsdk/cqsdk.h"
 #include "dice_exception.h"
