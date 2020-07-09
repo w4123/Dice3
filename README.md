@@ -5,7 +5,7 @@
 
 Dice! V3 是重构后的Dice!新版本
 
-实现了部分功能，剩余功能还在编写当中。具体信息可以参考: https://kokona.tech 开发日志一栏
+实现了部分功能，剩余功能还在编写当中。具体信息可以参考: https://forum.kokona.tech/d/183-dice-version-3/2
 
 本应用文档: https://docs.kokona.tech (还没写完)
 

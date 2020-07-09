@@ -24,3 +24,11 @@ install:
 build_script:
   - powershell .\scripts\generate.ps1 %CONFIGURATION%
   - powershell .\scripts\build.ps1 %CONFIGURATION%
+ 
+artifacts:
+  - path: build\$(configuration)\$(configuration)\app.dll
+    name: App DLL
+    
+  - path: app.json
+    name: App Json
+    
