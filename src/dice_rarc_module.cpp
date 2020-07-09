@@ -20,30 +20,42 @@ namespace dice {
 
     void rarc_module::process(const cq::event::MessageEvent &e, const std::wstring &ws) {
         std::wregex re(
-            L"[\\s]*[\\.。．][\\s]*r(a|c)(h)?[\\s]*((?:b|p)(?:[1-3])?)?[\\s]*([^\\s0-9]*)[\\s]*([0-9]*)[\\s]*([^]*)",
+            L"[\\s]*[\\.。．][\\s]*r(a|c)(h)?[\\s]*((?:b|p)(?:[1-3])?)?[\\s]*(?:(.*?)(?:--|—))?([^\\s0-9]*)[\\s]*([0-9]*)[\\s]*([^]*)",
             std::regex_constants::ECMAScript | std::regex_constants::icase);
         std::wsmatch m;
         if (std::regex_match(ws, m, re)) {
             // 获取骰子
             std::wstring dice(m[3]);
             if (dice.empty()) dice = L"D100";
-            // 投掷属性
-            std::string property(cq::utils::ws2s(m[4]));
-            // 原因
-            std::wstring reason(m[4]);
-            if (m[6].first != m[6].second) {
+			// 原因
+            std::wstring reason(m[5]);
+            if (m[7].first != m[7].second) {
                 if (reason.empty())
-                    reason = m[6];
+                    reason = m[7];
                 else
-                    reason += L"(" + m[6].str() + L")";
+                    reason += L"(" + m[7].str() + L")";
             }
+			// 人物卡
+			std::string character_card(cq::utils::ws2s(m[4]));
+			if (character_card.empty()) {
+				character_card = utils::get_chosen_card(e.target);
+			}
+			else {
+				reason = m[4].str() + L"--" + reason;
+			}
+            // 投掷属性
+            std::string property(cq::utils::ws2s(m[5]));
+
             int judge_value;
-            if (m[5].first != m[5].second) {
-                judge_value = std::stoi(m[5]);
+            if (m[6].first != m[6].second) {
+                judge_value = std::stoi(m[6]);
+				if (property.empty() && !m[4].str().empty()) {
+					throw exception::exception(msg::GetGlobalMsg("strPropertyInvalidError"));
+				}
             } else {
                 if (!property.empty()) {
                     judge_value =
-                        utils::get_single_card_properties(e.target, utils::get_chosen_card(e.target), property);
+                        utils::get_single_card_properties(e.target, character_card, property);
                 } else {
                     throw exception::exception(msg::GetGlobalMsg("strPropertyInvalidError"));
                 }
