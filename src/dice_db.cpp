@@ -34,8 +34,6 @@ namespace dice::db {
             "CREATE TABLE IF NOT EXISTS group_user_info (qq_id INTEGER NOT NULL, group_id INTEGER NOT NULL, type "
             "INTEGER "
             "NOT NULL, nick_name TEXT, card_chosen TEXT DEFAULT \"default\", PRIMARY KEY(qq_id, group_id, type))");
-        db->exec("CREATE TABLE IF NOT EXISTS global_msg (title TEXT PRIMARY KEY NOT NULL, val TEXT NOT NULL)");
-        db->exec("CREATE TABLE IF NOT EXISTS help_msg (title TEXT PRIMARY KEY NOT NULL, val TEXT NOT NULL)");
         if (db->execAndGet("SELECT count(*) FROM sqlite_master WHERE type = \"table\" AND name = \"deck\"").getInt() ==
             0) {
             db->exec(
@@ -54,36 +52,11 @@ namespace dice::db {
                 }
             }
         }
-
-        for (const auto &msg : msg::global_msg) {
-            SQLite::Statement st(*db, "INSERT OR IGNORE INTO global_msg(title, val) VALUES(?, ?)");
-            st.bind(1, msg.first);
-            st.bind(2, msg.second);
-            st.exec();
-        }
-        for (const auto &msg : msg::help_msg) {
-            SQLite::Statement st(*db, "INSERT OR IGNORE INTO help_msg(title, val) VALUES(?, ?)");
-            st.bind(1, msg.first);
-            st.bind(2, msg.second);
-            st.exec();
-        }
         tran.commit();
     }
 
     void SemiReplaceDB() {
         SQLite::Transaction tran(*db);
-        for (const auto &msg : msg::global_msg) {
-            SQLite::Statement st(*db, "REPLACE INTO global_msg(title, val) VALUES(?, ?)");
-            st.bind(1, msg.first);
-            st.bind(2, msg.second);
-            st.exec();
-        }
-        for (const auto &msg : msg::help_msg) {
-            SQLite::Statement st(*db, "REPLACE INTO help_msg(title, val) VALUES(?, ?)");
-            st.bind(1, msg.first);
-            st.bind(2, msg.second);
-            st.exec();
-        }
         db->exec("DROP TABLE deck");
         db->exec(
             "CREATE TABLE deck(name TEXT NOT NULL, content TEXT NOT NULL, origin TEXT NOT NULL "

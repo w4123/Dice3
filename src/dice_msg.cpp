@@ -6,13 +6,13 @@
 #include "dice_db.h"
 
 namespace dice::msg {
-    const std::string dice_ver = "3.0.0alpha w20191203";
-    const short dice_build = 1001;
+    const std::string dice_ver = "3.0.0alpha w20200709";
+    const short dice_build = 1002;
     const std::string dice_info = "Dice! by 溯洄 Version " + dice_ver + "(" + std::to_string(dice_build) + ")";
     const std::string dice_full_info =
-        dice_info + " [MSVC " + std::to_string(_MSC_FULL_VER) + " " + __DATE__ + " " + __TIME__ + "]";
+        dice_info + " [MSVC " + std::to_string(_MSC_VER) + " " + __DATE__ + " " + __TIME__ + "]";
     const utility::string_t dice_user_agent = utility::conversions::to_string_t("Dice/" + dice_ver);
-    const std::map<std::string, std::string> global_msg {
+    std::map<std::string, std::string> global_msg {
         {"strRollDice", "{nick} 投掷 {reason}: {dice_expression}"},
             {"strRollDiceWithJudge", "{nick} 投掷 {reason}: {dice_expression}/{judge_value} {success_indicator}"},
             {"strHiddenDice", "{nick}进行了一次暗骰"},
@@ -67,12 +67,12 @@ namespace dice::msg {
             {"strCriticalSuccess", "大成功"}
         }; // namespace dice::msg
 
-const std::map<std::string, std::string> help_msg{
+std::map<std::string, std::string> help_msg{
     {"default",
      "Dice! by 溯洄 Version 3 帮助\n输入.bot以获取版本信息\n输入.help "
      "license以获取软件开源协议信息\n使用说明请访问: https://docs.kokona.tech\n已实现功能: r rh(包括多轮 rp rb, "
      "不包括rf 简化) coc dnd "
-     "bot help set(不包括setcoc) jrrp rules dismiss n/nn/nnn name draw ti/li st(暂不能ra/rc)"},
+     "bot help set setcoc jrrp rules dismiss n/nn/nnn name draw ti/li st ra/rc"},
     {"license",
      "Dice! Version 3 使用MIT协议发布, 详细协议及使用的其他开源项目协议请见源代码\n源代码地址: "
      "https://github.com/w4123/Dice3"}};
@@ -2775,20 +2775,10 @@ const std::map<std::string, int> SkillDefaultVal = {
     {"斗殴", 25}};
 
 std::string GetGlobalMsg(const std::string &str) {
-    SQLite::Statement st(*db::db, "SELECT val FROM global_msg WHERE title=?");
-    st.bind(1, str);
-    if (st.executeStep()) {
-        return st.getColumn(0).getString();
-    }
-    return "内部错误: 数据库信息获取错误";
+	return global_msg[str];
 }
 
 std::string GetHelpMsg(const std::string &str) {
-    SQLite::Statement st(*db::db, "SELECT val FROM help_msg WHERE title=?");
-    st.bind(1, str);
-    if (st.executeStep()) {
-        return st.getColumn(0).getString();
-    }
-    return GetGlobalMsg("strHelpNotFoundError");
+	return help_msg[str];
 }
 } // namespace dice::msg
