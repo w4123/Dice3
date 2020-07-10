@@ -4,13 +4,14 @@
 #include "SQLiteCpp/SQLiteCpp.h"
 #include "cpprest/asyncrt_utils.h"
 #include "dice_db.h"
+#include "build_defs.h"
 
 namespace dice::msg {
-    const std::string dice_ver = "3.0.0alpha w20200709";
+    const std::string dice_ver = "3.0.0alpha nightly";
     const short dice_build = 1002;
     const std::string dice_info = "Dice! by 溯洄 Version " + dice_ver + "(" + std::to_string(dice_build) + ")";
     const std::string dice_full_info =
-        dice_info + " [MSVC " + std::to_string(_MSC_VER) + " " + __DATE__ + " " + __TIME__ + "]";
+        dice_info + " [MSVC " + std::to_string(_MSC_VER) + " " + std::to_string(BUILD_YEAR) + "-" + std::to_string(BUILD_MONTH) + "-" + std::to_string(BUILD_DAY) +  " " __TIME__  "]";
     const utility::string_t dice_user_agent = utility::conversions::to_string_t("Dice/" + dice_ver);
     std::map<std::string, std::string> global_msg {
         {"strRollDice", "{nick} 投掷 {reason}: {dice_expression}"},
