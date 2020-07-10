@@ -90,10 +90,10 @@ namespace dice {
                 throw exception::dice_expression_invalid_error();
             }
 
-            // 骰子前后有数字属于错误表达式
-            if ((i->position() && std::iswdigit(dice_expression[i->position() - 1]))
+            // 骰子前后有数字或者点属于错误表达式
+            if ((i->position() && (std::iswdigit(dice_expression[i->position() - 1]) || dice_expression[i->position() - 1] == L'.'))
                 || (i->position() + i->length() != dice_expression.length()
-                    && std::iswdigit(dice_expression[i->position() + i->length()]))) {
+                    && (std::iswdigit(dice_expression[i->position() + i->length()]) || dice_expression[i->position() + i->length()] == L'.'))) {
                 throw exception::dice_expression_invalid_error();
             }
 
