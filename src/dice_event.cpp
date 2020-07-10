@@ -23,6 +23,7 @@
 #include "dice_rarc_module.h"
 #include "dice_msg_queue.h"
 #include "dice_setcoc_module.h"
+#include "dice_rf_module.h"
 
 CQ_MAIN {
     cq::config.convert_unicode_emoji = false;
@@ -68,6 +69,8 @@ CQ_MAIN {
         static dice::dnd_module DndModule;
         // 判定掷骰
         static dice::rarc_module RarcModule;
+		// Fudge掷骰
+        static dice::rf_module RfModule;
         // 普通掷骰
         static dice::r_module RModule;
     };
