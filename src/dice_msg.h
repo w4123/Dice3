@@ -17,5 +17,6 @@ namespace dice::msg {
     extern const std::map<std::string, std::string> SkillNameReplace;
     std::string GetGlobalMsg(const std::string& str);
     std::string GetHelpMsg(const std::string& str);
+	std::pair<bool, int> load_custom_msg(const std::string& filePath);
 }
 

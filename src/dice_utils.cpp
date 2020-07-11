@@ -608,7 +608,7 @@ namespace dice::utils {
             size_t last = 0;
             for (auto it = words_begin; it != words_end; ++it) {
                 need_format = true;
-                std::string format_str(std::string((*it)[1].first, (*it)[1].second));
+                std::string format_str((*it)[1]);
                 new_str += old_str.substr(last, it->position() - last);
                 if (format_str[0] == '!') {
                     std::string dice = format_str.substr(1);
@@ -697,8 +697,11 @@ namespace dice::utils {
                         new_str += st1.getColumn(0).getText();
                     }
                     mp[deck_name].push_back(offset_num);
-                } else if (format_para.count(format_str)) {
-                    new_str += format_para.at(std::string((*it)[1].first, (*it)[1].second));
+                } else {
+                    if (format_para.count(format_str))
+                    	new_str += format_para.at(format_str);
+                    else if (msg::global_msg.count(format_str))
+                        new_str += msg::global_msg.at(format_str);
                 }
                 last = it->position() + it->length();
             }

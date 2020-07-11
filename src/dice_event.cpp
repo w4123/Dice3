@@ -24,21 +24,41 @@
 #include "dice_msg_queue.h"
 #include "dice_setcoc_module.h"
 #include "dice_rf_module.h"
+#include "dice_msg.h"
+#include "dice_utils.h"
 
 CQ_MAIN {
     cq::config.convert_unicode_emoji = false;
     // 应用启用时调用，进行模块启用
     cq::app::on_enable = []
     {
+		std::string app_dir = cq::api::get_app_directory();
+		
         // 连接数据库
         dice::db::db = std::make_unique<SQLite::Database>(
-            cq::api::get_app_directory() + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",
+            app_dir + "DiceConfig_" + std::to_string(cq::api::get_login_user_id()) + ".db",
             SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE,
             3000);
 
         dice::db::InitialiseDB();
         // 启动异步消息发送队列
         dice::msg_queue::MsgQueue.start();
+		try {
+			// 读取自定义回复
+            auto res = dice::msg::load_custom_msg(cq::utils::string_to_coolq(app_dir) + "CustomMsg.json");
+			if (res.first) {
+				if (res.second != 0) {
+					dice::msg_queue::MsgQueue.add(cq::Target(cq::api::get_login_user_id()), dice::utils::format_string(dice::msg::GetGlobalMsg("strCustomMsgInvalid"),
+                                     std::map<std::string, std::string>{{"invalid_count", std::to_string(res.second)}}));	
+				}
+				else {
+					dice::msg_queue::MsgQueue.add(cq::Target(cq::api::get_login_user_id()), dice::msg::GetGlobalMsg("strCustomMsgSuccess"));
+				}	
+			}
+		} catch(const std::exception& ex) {
+			dice::msg_queue::MsgQueue.add(cq::Target(cq::api::get_login_user_id()), dice::utils::format_string(dice::msg::GetGlobalMsg("strCustomMsgError"),
+                                     std::map<std::string, std::string>{{"exception", ex.what()}}));
+		}
         // 机器人退群
         static dice::dismiss_module DismissModule;
         // 机器人控制

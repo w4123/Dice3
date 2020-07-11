@@ -37,6 +37,7 @@ find_package(cpprestsdk CONFIG REQUIRED)
 find_package(unofficial-brotli CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 set(LIB_NAME "app")
@@ -49,6 +50,7 @@ target_link_libraries(${LIB_NAME} PRIVATE cpprestsdk::cpprest)
 target_link_libraries(${LIB_NAME} PRIVATE unofficial::iconv::libiconv unofficial::iconv::libcharset)
 target_link_libraries(${LIB_NAME} PRIVATE sqlite3)
 target_link_libraries(${LIB_NAME} PRIVATE SQLiteCpp)
+target_link_libraries(${LIB_NAME} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
 cotire(${LIB_NAME})
 

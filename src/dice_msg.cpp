@@ -5,6 +5,7 @@
 #include "cpprest/asyncrt_utils.h"
 #include "dice_db.h"
 #include "build_defs.h"
+#include "nlohmann/json.hpp"
 
 namespace dice::msg {
     const std::string dice_ver = "3.0.0alpha nightly";
@@ -65,7 +66,16 @@ namespace dice::msg {
             {"strSuccess", "成功"},
             {"strHardSuccess", "困难成功"},
             {"strExtremeSuccess", "极难成功"},
-            {"strCriticalSuccess", "大成功"}
+            {"strCriticalSuccess", "大成功"},
+			{"strFudgeTerrible", "糟糕!"},
+			{"strFudgePoor", "差劲"},
+			{"strFudgeMediocre", "平庸"},
+			{"strFudgeFair", "尚可"},
+			{"strFudgeGood", "良好"},
+			{"strFudgeGreat", "出色"},
+			{"strCustomMsgSuccess", "自定义回复读取成功!"},
+			{"strCustomMsgError", "自定义回复读取失败,错误信息:\n{exception}"},
+			{"strCustomMsgInvalid", "自定义回复读取成功, 但其中有{invalid_count}条无效!"}
         }; // namespace dice::msg
 
 std::map<std::string, std::string> help_msg{
@@ -2782,4 +2792,26 @@ std::string GetGlobalMsg(const std::string &str) {
 std::string GetHelpMsg(const std::string &str) {
 	return help_msg[str];
 }
+
+std::pair<bool, int> load_custom_msg(const std::string& file_path) {
+    nlohmann::json j_map;
+    std::ifstream msg_stream(file_path);
+    if (msg_stream)
+    {
+		int invalid_count = 0;
+        msg_stream >> j_map;
+        msg_stream.close();
+        for (nlohmann::json::iterator it = j_map.begin(); it != j_map.end(); ++it) {
+            if (global_msg.count(it.key())) {
+				global_msg[it.key()] = it.value();
+            }
+			else {
+				invalid_count++;
+			}
+        }
+		return std::make_pair(true, invalid_count);
+    }
+    return std::make_pair(false, 0);
+}
+
 } // namespace dice::msg

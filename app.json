@@ -135,7 +135,7 @@
         // 128, // setGroupSpecialTitle
         130, // getGroupMemberInfoV2 / getGroupMemberInfo
         131, // getStrangerInfo
-        // 140, // setDiscussLeave
+        140, // setDiscussLeave
         // 150, // setFriendAddRequest
         // 151, // setGroupAddRequest
         160, // getGroupMemberList

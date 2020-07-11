@@ -6,3 +6,4 @@ openssl
 brotli
 zlib
 cpprestsdk
+nlohmann-json

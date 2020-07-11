@@ -19,6 +19,8 @@ namespace dice {
         : dice_count(dice_count), add_value(add_value) {
         main_calculate();
     }
+	
+	
 
     void fudge_calculator::main_calculate() {
 		std::uniform_int_distribution gen(-1, 1);
@@ -68,6 +70,34 @@ namespace dice {
             str += L"=" + res;
         }
         if (str.length() > 160) str = dice_expression + L"=" + res;
+		if (dice_count == 4 && !add_value)
+		{
+			str.append(L" ");
+			switch(int(result))
+			{
+			case -3:
+				str.append(L"{strFudgeTerrible}");
+				break;
+			case -2:
+				str.append(L"{strFudgePoor}");
+				break;
+			case -1:
+			    str.append(L"{strFudgeMediocre}");
+				break;
+			case 0:
+				str.append(L"{strFudgeFair}");
+				break;
+			case 1:
+				str.append(L"{strFudgeGood}");
+				break;
+			case 2:
+		        str.append(L"{strFudgeGreat}");
+				break;
+			case 3:
+				str.append(L"{strFudgeSuperb}");
+				break;
+			}
+		}
         return str;
     }
 } // namespace dice
