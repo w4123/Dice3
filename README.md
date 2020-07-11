@@ -9,8 +9,11 @@ Dice! V3 是重构后的Dice!新版本
 
 本应用文档: https://docs.kokona.tech (还没写完)
 
+## 下载
 
-## 使用方式
+点击[这里](https://github.com/w4123/Dice3/releases)进入Releases下载最新的预览版，或者点击[这里](https://ci.appveyor.com/project/w4123/dice3)进入CI下载最新的nightly版!
+
+## 编译方式
 
 ### 预备
 
